@@ -1,0 +1,26 @@
+media:
+  path: public/images/uploads
+
+content:
+  - name: blog
+    label: Blog Posts
+    type: collection
+    path: src/content/blog
+    format: frontmatter
+    fields:
+      - name: title
+        label: Judul Artikel
+        type: string
+        required: true
+      - name: pubDate
+        label: Tanggal Terbit
+        type: date
+      - name: description
+        label: Deskripsi (SEO)
+        type: string
+      - name: image
+        label: Gambar Utama
+        type: image
+      - name: body
+        label: Isi Konten
+        type: rich-text
