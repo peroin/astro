@@ -1,11 +1,29 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import { getCollection } from 'astro:content';
+const allPosts = await getCollection('blog');
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<html lang="id">
+	<head>
+		<meta charset="utf-8" />
+		<title>My Crypto Blog</title>
+	</head>
+	<body class="bg-slate-900 text-white p-10">
+		<h1 class="text-3xl font-bold mb-5">Daftar Artikel</h1>
+		
+		{allPosts.length === 0 && (
+			<p class="text-gray-400">Belum ada artikel. Coba buat satu di Pages CMS dan lakukan 'git pull'.</p>
+		)}
+
+		<ul class="space-y-4">
+			{allPosts.map(post => (
+				<li class="border border-slate-700 p-4 rounded-lg hover:bg-slate-800 transition">
+					<a href={`/blog/${post.slug}`} class="text-xl text-blue-400 font-semibold hover:underline">
+						{post.data.title}
+					</a>
+					<p class="text-gray-400 text-sm mt-1">{post.data.pubDate?.toDateString()}</p>
+				</li>
+			))}
+		</ul>
+	</body>
+</html>
