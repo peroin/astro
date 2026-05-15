@@ -2,11 +2,66 @@ media:
   path: public/images/uploads
 
 content:
-  - name: blog
-    label: Blog Posts
+  # KOLEKSI UNTUK WORLD
+  - name: world
+    label: "World Intelligence"
     type: collection
-    path: src/content/blog
+    path: src/content/blog/world
     format: frontmatter
+    media:
+      path: public/images/world
+    fields:
+      - name: title
+        label: Judul Artikel
+        type: string
+        required: true
+      - name: pubDate
+        label: Tanggal Terbit
+        type: date
+      - name: description
+        label: Deskripsi (SEO)
+        type: string
+      - name: image
+        label: Gambar Utama
+        type: image
+      - name: body
+        label: Isi Konten
+        type: rich-text
+
+  # KOLEKSI UNTUK MARKET
+  - name: market
+    label: "Market Analysis"
+    type: collection
+    path: src/content/blog/market
+    format: frontmatter
+    media:
+      path: public/images/market
+    fields:
+      - name: title
+        label: Judul Artikel
+        type: string
+        required: true
+      - name: pubDate
+        label: Tanggal Terbit
+        type: date
+      - name: description
+        label: Deskripsi (SEO)
+        type: string
+      - name: image
+        label: Gambar Utama
+        type: image
+      - name: body
+        label: Isi Konten
+        type: rich-text
+
+  # KOLEKSI UNTUK COMPANY
+  - name: company
+    label: "Company News"
+    type: collection
+    path: src/content/blog/company
+    format: frontmatter
+    media:
+      path: public/images/company
     fields:
       - name: title
         label: Judul Artikel
