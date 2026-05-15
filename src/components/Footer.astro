@@ -1,0 +1,81 @@
+---
+// src/components/Footer.astro
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="bg-[#1a1a1a] text-gray-400 py-16 mt-20 border-t-8 border-[#990000]">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <!-- Brand & Description -->
+            <div class="md:col-span-1">
+                <a href="/" class="inline-block">
+                    <h2 class="text-white text-2xl font-serif font-black italic mb-4 tracking-tighter uppercase">
+                        Dailyrwa <span class="text-[#990000]">Research</span>
+                    </h2>
+                </a>
+                <p class="text-[11px] leading-relaxed mb-6">
+                    Lembaga riset independen yang fokus pada intelijen kebijakan global, makroekonomi, dan tokenisasi Real World Assets (RWA) untuk sektor institusional.
+                </p>
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center hover:border-white transition-colors cursor-pointer text-white text-xs">𝕏</div>
+                    <div class="w-8 h-8 rounded-full border border-gray-700 flex items-center justify-center hover:border-white transition-colors cursor-pointer text-white text-xs">in</div>
+                </div>
+            </div>
+
+            <!-- Sections Link -->
+            <div>
+                <h4 class="text-white text-[10px] font-black uppercase tracking-widest mb-6 border-b border-gray-800 pb-2">Intelligence Sections</h4>
+                <ul class="text-[11px] space-y-3 font-bold uppercase tracking-tight">
+                    <li><a href="/world" class="hover:text-white transition-colors">World Intelligence</a></li>
+                    <li><a href="/market" class="hover:text-white transition-colors">Capital Markets</a></li>
+                    <li><a href="/company" class="hover:text-white transition-colors">Corporate Strategy</a></li>
+                    <li><a href="/crypto" class="hover:text-white transition-colors">Digital Asset & RWA</a></li>
+                </ul>
+            </div>
+
+            <!-- Legal & Resources -->
+            <div>
+                <h4 class="text-white text-[10px] font-black uppercase tracking-widest mb-6 border-b border-gray-800 pb-2">Institutional Resources</h4>
+                <ul class="text-[11px] space-y-3">
+                    <li><a href="/about" class="hover:text-white transition-colors font-bold text-gray-300">About the Research Group</a></li>
+                    <li><a href="/terms" class="hover:text-white transition-colors">Term & Conditions</a></li>
+                    <li><a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                    <li><a href="/contact" class="hover:text-white transition-colors">Contact Research Team</a></li>
+                </ul>
+            </div>
+
+            <!-- Newsletter -->
+            <div>
+                <h4 class="text-white text-[10px] font-black uppercase tracking-widest mb-6 border-b border-gray-800 pb-2">Intelligence Briefing</h4>
+                <p class="text-[10px] mb-4">Dapatkan analisis pasar mingguan langsung ke email Anda.</p>
+                <form class="flex flex-col gap-2">
+                    <input 
+                        type="email" 
+                        placeholder="Institutional Email Address" 
+                        class="bg-[#2a2a2a] border border-gray-700 px-3 py-2 text-[11px] focus:outline-none focus:border-[#990000] text-white" 
+                    />
+                    <button type="submit" class="bg-[#990000] text-white text-[10px] font-black uppercase py-2 hover:bg-red-700 transition-colors">
+                        Subscribe to Analysis
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Bottom Footer -->
+        <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-[9px] uppercase tracking-[0.3em]">
+                © {currentYear} Dailyrwa Research Group. 
+                <span class="hidden md:inline">|</span> 
+                <span class="text-gray-600 italic">Analytical Infrastructure by AI Labs Indonesia</span>
+            </p>
+            <div class="flex gap-4">
+                <p class="text-[9px] uppercase tracking-[0.1em] text-gray-500 italic">
+                    Market data is delayed by 15 mins.
+                </p>
+                <p class="text-[9px] uppercase tracking-[0.1em] text-gray-500 font-bold">
+                    Jakarta • London • Singapore
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>

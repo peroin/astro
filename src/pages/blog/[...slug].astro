@@ -1,20 +1,251 @@
 ---
-import { getCollection } from 'astro:content';
+// src/pages/blog/[...slug].astro
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
 
-// 1. Generate path untuk setiap artikel
+// 1. Pemetaan Rute Dinamis (Astro v5)
 export async function getStaticPaths() {
-  const blogEntries = await getCollection('blog');
-  return blogEntries.map(entry => ({
-    params: { slug: entry.slug }, props: { entry },
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { 
+      // Menggunakan post.id (misal: 'world/post-1' atau 'market/crypto-update')
+      slug: post.id 
+    },
+    props: { post },
   }));
 }
 
-// 2. Ambil data artikel
-const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+// 2. Format Tanggal
+const pubDate = post.data.pubDate.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+});
+
+// 3. Data Navigasi (Disesuaikan dengan folder konten Anda)
+const mainCategories = [
+    { id: 'world', label: 'World' },
+    { id: 'market', label: 'Market' },
+    { id: 'company', label: 'Company' },
+    { id: 'digital-asset', label: 'Digital Asset' }
+];
+
+const authorInitials = post.data.author 
+  ? post.data.author.split(' ').map(n => n[0]).join('').toUpperCase() 
+  : "IM";
 ---
 
-<h1>{entry.data.title}</h1>
-<p>Diterbitkan pada: {entry.data.pubDate.toDateString()}</p>
-<hr />
-<Content />
+<Layout 
+    title={`${post.data.title} | Daily RWA Intelligence`}
+    description={post.data.description}
+    post={post}
+>
+    <style is:global>
+        /* Typography & UI Effects */
+        .article-content { 
+            font-size: 1.15rem; 
+            line-height: 1.8; 
+            color: #1f2937; 
+        }
+        .article-content h2 { 
+            font-weight: 800; 
+            font-size: 2rem; 
+            margin-top: 3rem; 
+            margin-bottom: 1.25rem; 
+            color: #000; 
+            letter-spacing: -0.025em;
+        }
+        .article-content p { margin-bottom: 1.75rem; }
+        
+        #nav-dropdown {
+            opacity: 0; 
+            transform: translateY(-10px) scale(0.95); 
+            pointer-events: none;
+            transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        #nav-dropdown.active { 
+            opacity: 1; 
+            transform: translateY(0) scale(1); 
+            pointer-events: auto; 
+        }
+        
+        .hamburger .line { height: 2px; background-color: #000; transition: all 0.3s ease; }
+        .hamburger.active .line-1 { transform: translateY(7px) rotate(45deg); }
+        .hamburger.active .line-2 { opacity: 0; }
+        .hamburger.active .line-3 { transform: translateY(-7px) rotate(-45deg); }
+
+        /* Dropcap Modern */
+        .article-content > p:first-of-type::first-letter {
+            float: left;
+            font-size: 4rem;
+            line-height: 0.85;
+            padding-top: 4px;
+            padding-right: 12px;
+            font-weight: 800;
+            color: #990000;
+        }
+    </style>
+
+    <!-- NAVIGATION -->
+    <nav class="sticky top-0 w-full z-[120] bg-white/90 backdrop-blur-md border-b border-gray-100 h-16">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 h-full flex justify-between items-center relative">
+            <a href="/" class="flex items-center group">
+                <span class="text-xl font-black tracking-tighter uppercase">
+                    DAILY<span class="text-[#990000] group-hover:tracking-normal transition-all duration-300">RWA</span>
+                </span>
+            </a>
+
+            <!-- Desktop Menu -->
+            <ul class="hidden lg:flex gap-8 text-[10px] font-black text-black uppercase tracking-[0.2em]">
+                {mainCategories.map(cat => (
+                    <li>
+                        <a href={`/blog/${cat.id}`} class="hover:text-[#990000] transition-colors">
+                            {cat.label}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+
+            <div class="flex items-center gap-4">
+                <button id="menu-toggle" class="flex flex-col justify-center items-end gap-[5px] w-8 h-8 focus:outline-none hamburger lg:hidden">
+                    <div class="line line-1 w-6"></div>
+                    <div class="line line-2 w-4"></div>
+                    <div class="line line-3 w-6"></div>
+                </button>
+            </div>
+
+            <!-- Mobile Dropdown -->
+            <div id="nav-dropdown" class="absolute top-20 right-4 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-4 lg:hidden">
+                {mainCategories.map(cat => (
+                    <a href={`/blog/${cat.id}`} class="block px-8 py-4 text-[10px] font-black text-black uppercase tracking-widest hover:bg-gray-50 border-b border-gray-50 last:border-0">
+                        {cat.label}
+                    </a>
+                ))}
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-12 lg:py-24">
+        <div class="flex flex-col lg:grid lg:grid-cols-12 gap-16">
+            
+            <!-- MAIN ARTICLE -->
+            <article class="lg:col-span-8">
+                <header class="mb-16">
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="bg-black text-white text-[9px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-sm">
+                            {post.data.category || 'Intelligence'}
+                        </span>
+                        <time class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                            {pubDate}
+                        </time>
+                    </div>
+
+                    <h1 class="text-4xl md:text-6xl font-extrabold text-black leading-[1.1] mb-10 tracking-tighter">
+                        {post.data.title}
+                    </h1>
+
+                    <div class="flex items-center gap-4 border-y border-gray-100 py-6 mb-12">
+                        <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-400">
+                            {authorInitials}
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-black uppercase tracking-widest text-black">
+                                {post.data.author || 'Iqbal Maulana'}
+                            </p>
+                            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                                Analyst, Daily RWA Bureau
+                            </p>
+                        </div>
+                    </div>
+
+                    {post.data.image && (
+                        <div class="relative group overflow-hidden rounded-3xl shadow-2xl">
+                            <img 
+                                src={post.data.image} 
+                                alt={post.data.title} 
+                                class="w-full aspect-video object-cover transition-transform duration-700 group-hover:scale-105" 
+                            />
+                        </div>
+                    )}
+                </header>
+
+                <div class="article-content prose prose-stone max-w-none">
+                    <Content />
+                </div>
+
+                <!-- BOTTOM CTA -->
+                <div class="mt-20 p-10 bg-gray-50 rounded-3xl border border-gray-100 text-center">
+                    <h3 class="text-xl font-extrabold mb-4">Butuh Analisis Lebih Dalam?</h3>
+                    <p class="text-sm text-gray-600 mb-8 max-w-md mx-auto">Masuk ke dalam jaringan Daily RWA untuk mendapatkan laporan eksklusif setiap minggunya.</p>
+                    <a href="/subscribe" class="inline-block bg-[#990000] text-white px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:shadow-xl hover:shadow-red-900/20 transition-all">
+                        Dapatkan Akses Penuh
+                    </a>
+                </div>
+            </article>
+
+            <!-- SIDEBAR -->
+            <aside class="lg:col-span-4 space-y-12">
+                <div class="sticky top-28 space-y-12">
+                    <!-- AD SLOT -->
+                    <div class="group relative bg-white border-2 border-dashed border-gray-200 p-4 rounded-2xl">
+                        <span class="absolute -top-3 left-6 bg-white px-2 text-[9px] font-black text-gray-300 uppercase tracking-widest">Advertisement</span>
+                        <div class="aspect-square bg-gray-50 rounded-xl flex items-center justify-center text-center p-8">
+                            <div>
+                                <p class="text-[10px] font-black uppercase text-gray-400 tracking-tighter mb-4">Partner with Daily RWA</p>
+                                <button class="text-[9px] font-black text-black border-b-2 border-black pb-1 uppercase">Media Kit 2026</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RECENT SECTION -->
+                    <div class="bg-black text-white p-10 rounded-[2.5rem]">
+                        <h3 class="text-xs font-black uppercase tracking-[0.2em] mb-2 text-[#990000]">Bureau Briefing</h3>
+                        <p class="text-2xl font-extrabold mb-8 tracking-tighter">Stay ahead of the tokenization curve.</p>
+                        
+                        <div class="space-y-4">
+                            <input 
+                                type="email" 
+                                placeholder="name@firm.com" 
+                                class="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-[#990000] transition-colors"
+                            />
+                            <button class="w-full bg-[#990000] py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-colors">
+                                Join Intelligence Network
+                            </button>
+                        </div>
+                        <p class="text-[8px] text-gray-500 mt-6 text-center uppercase tracking-widest">Encrypted Transmission</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-100 py-20 mt-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <span class="text-[10px] font-black uppercase tracking-[0.5em] text-gray-300 block mb-8">Daily RWA Intelligence Terminal</span>
+            <div class="flex justify-center gap-12 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                <a href="/privacy" class="hover:text-black transition-colors">Privacy</a>
+                <a href="/terms" class="hover:text-black transition-colors">Terms</a>
+                <a href="https://ailabs.id" class="text-black font-black">AI LABS</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const btn = document.getElementById('menu-toggle');
+        const drop = document.getElementById('nav-dropdown');
+        
+        btn?.addEventListener('click', (e) => { 
+            e.stopPropagation(); 
+            btn.classList.toggle('active'); 
+            drop?.classList.toggle('active'); 
+        });
+
+        document.addEventListener('click', () => { 
+            btn?.classList.remove('active'); 
+            drop?.classList.remove('active'); 
+        });
+    </script>
+</Layout>

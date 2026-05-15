@@ -1,0 +1,47 @@
+---
+const navItems = [
+  { name: 'Home', url: '/' },
+  { name: 'Markets', url: '/market' },
+  { name: 'World', url: '/world' },
+  { name: 'Company', url: '/company' },
+  { name: 'Tech', url: '/tech' },
+  { name: 'RWA Research', url: '/research' },
+];
+
+const { activePath = "" } = Astro.props;
+---
+
+<nav class="w-full bg-white">
+  <!-- The Double Rule Container -->
+  <div class="border-t-2 border-b border-black">
+    <div class="max-w-7xl mx-auto px-4">
+      <!-- Layout: Flex Center & Responsive Scroll -->
+      <ul class="flex justify-center items-center gap-8 md:gap-12 overflow-x-auto no-scrollbar py-3">
+        {navItems.map((item) => (
+          <li class="flex-shrink-0">
+            <a 
+              href={item.url} 
+              class:list={[
+                "font-sans text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-300 hover:text-red-800",
+                activePath === item.url ? "text-black relative after:content-[''] after:absolute after:-bottom-[13px] after:left-0 after:right-0 after:h-[3px] after:bg-black" : "text-gray-600"
+              ]}
+            >
+              {item.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<style>
+  /* Menghilangkan scrollbar di mobile agar tetap minimalis */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>

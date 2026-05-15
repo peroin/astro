@@ -1,0 +1,185 @@
+---
+import { getCollection, render } from 'astro:content';
+import SEO from '../../components/SEO.astro';
+import Footer from '../../components/Footer.astro';
+
+export async function getStaticPaths() {
+  const worldPosts = await getCollection('blog', ({ id }) => {
+    return id.startsWith('world/');
+  });
+
+  return worldPosts.map(post => ({
+    params: { 
+      slug: post.id.replace('world/', '') 
+    },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+// Mengambil berita terbaru khusus kategori World
+const latestWorldNews = (await getCollection('blog', ({ id }) => id.startsWith('world/')))
+  .filter(p => p.id !== post.id)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 6);
+
+const formattedDate = post.data.pubDate.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+});
+
+// JSON-LD untuk Skema Berita Dunia
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "headline": post.data.title,
+  "description": post.data.description,
+  "image": [post.data.image],
+  "datePublished": post.data.pubDate.toISOString(),
+  "author": {
+    "@type": "Person",
+    "name": "Iqbal Maulana"
+  }
+};
+---
+
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <SEO 
+        title={`${post.data.title} - World Intelligence`} 
+        description={post.data.description}
+        image={post.data.image}
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style is:global>
+        :root {
+            --world-blue: #004477;
+            --paper-bg: #ffffff;
+        }
+        body { background-color: var(--paper-bg); color: #111; font-family: 'Inter', sans-serif; }
+        
+        /* Typography khusus artikel World News menggunakan Lora agar nyaman dibaca lama */
+        .prose-world { font-family: 'Lora', serif; font-size: 1.2rem; line-height: 1.9; color: #222; }
+        .prose-world h2 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; margin-top: 3rem; margin-bottom: 1.5rem; color: var(--world-blue); }
+        .prose-world p { margin-bottom: 1.8rem; }
+        .prose-world blockquote { border-left: 5px solid var(--world-blue); padding: 1rem 2rem; font-style: italic; background: #f8fafc; margin: 3rem 0; font-size: 1.3rem; }
+        
+        .ad-box { background: #f3f4f6; border: 1px solid #e5e7eb; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .ad-label { font-size: 9px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- NAVBAR -->
+    <nav class="border-b-4 border-[var(--world-blue)] py-5 bg-white sticky top-0 z-50 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
+            <a href="/world" class="font-black text-[10px] uppercase tracking-[0.2em] text-slate-500 hover:text-[var(--world-blue)] transition-colors">
+                &larr; World Section
+            </a>
+            <div class="font-serif font-black italic text-2xl">
+                Daily <span class="text-[var(--world-blue)]">RWA</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            
+            <!-- LEFT COLUMN: ARTICLE -->
+            <article class="lg:col-span-8">
+                <header class="mb-10 text-center lg:text-left">
+                    <div class="inline-block text-[var(--world-blue)] font-black text-[11px] uppercase tracking-widest border-b-2 border-[var(--world-blue)] mb-6">
+                        Global Report
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-serif font-black leading-tight mb-8">
+                        {post.data.title}
+                    </h1>
+                    <div class="flex items-center justify-center lg:justify-start gap-6 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+                        <span class="text-slate-900 font-black tracking-normal">Iqbal Maulana</span>
+                        <span>{formattedDate}</span>
+                    </div>
+                </header>
+
+                <!-- AD 1: Leaderboard Top -->
+                <div class="ad-box w-full py-8 mb-10">
+                    <span class="ad-label">Advertisement</span>
+                    <div class="text-xs text-slate-300 uppercase">Banner Desktop / Tablet 728x90</div>
+                </div>
+
+                {post.data.image && (
+                    <figure class="mb-12">
+                        <img src={post.data.image} alt={post.data.title} class="w-full h-auto shadow-2xl" />
+                        <figcaption class="mt-4 text-[11px] text-slate-400 italic font-medium leading-relaxed">
+                            Reporting from the frontlines of global shifts. © 2026 Daily RWA World Intelligence.
+                        </figcaption>
+                    </figure>
+                )}
+
+                <div class="prose-world max-w-none">
+                    <Content />
+                </div>
+
+                <!-- AD 2: Mid-Article Native -->
+                <div class="my-16 ad-box w-full p-10 bg-slate-50 border-double border-4 border-slate-200">
+                    <span class="ad-label">Sponsored Intelligence</span>
+                    <div class="text-center font-serif italic text-slate-500">
+                        Space for Native Recommendations or High-Impact Display Ads
+                    </div>
+                </div>
+            </article>
+
+            <!-- RIGHT COLUMN: SIDEBAR -->
+            <aside class="lg:col-span-4">
+                <div class="sticky top-32 space-y-16">
+                    
+                    <!-- AD 3: Sidebar Skyscraper -->
+                    <div class="ad-box w-full min-h-[400px]">
+                        <span class="ad-label">Global Partner Ad</span>
+                        <div class="text-xs text-slate-300">Vertical Ad Unit</div>
+                    </div>
+
+                    <!-- LATEST WORLD NEWS -->
+                    <section>
+                        <h3 class="font-black text-[12px] uppercase tracking-widest border-b-2 border-black pb-2 mb-8">
+                            Recent Reports
+                        </h3>
+                        <div class="space-y-10">
+                            {latestWorldNews.map(news => (
+                                <a href={`/world/${news.id.replace('world/', '')}`} class="group block">
+                                    <h4 class="font-serif font-bold text-lg leading-snug group-hover:text-[var(--world-blue)] group-hover:underline transition-all">
+                                        {news.data.title}
+                                    </h4>
+                                    <p class="text-[10px] font-black text-slate-400 mt-3 uppercase tracking-tighter">
+                                        {news.data.pubDate.toLocaleDateString('id-ID')}
+                                    </p>
+                                </a>
+                            ))}
+                        </div>
+                    </section>
+
+                    <!-- QUICK LINKS -->
+                    <div class="bg-slate-900 p-8 text-white">
+                        <h5 class="font-black text-[10px] uppercase tracking-widest mb-4 opacity-50">Global Network</h5>
+                        <ul class="text-xs space-y-3 font-bold">
+                            <li><a href="/market" class="hover:text-[var(--world-blue)]">&rarr; Market Dashboard</a></li>
+                            <li><a href="/company" class="hover:text-[var(--world-blue)]">&rarr; Corporate Intelligence</a></li>
+                            <li><a href="/" class="hover:text-[var(--world-blue)]">&rarr; Main Terminal</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <Footer />
+</body>
+</html>

@@ -1,0 +1,188 @@
+---
+import { getCollection, render } from 'astro:content';
+import SEO from '../../components/SEO.astro';
+import Footer from '../../components/Footer.astro';
+
+export async function getStaticPaths() {
+  const companyPosts = await getCollection('blog', ({ id }) => {
+    return id.startsWith('company/');
+  });
+
+  return companyPosts.map(post => ({
+    params: { 
+      slug: post.id.replace('company/', '') 
+    },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+// Mengambil berita terbaru khusus kategori Company
+const latestCompanyNews = (await getCollection('blog', ({ id }) => id.startsWith('company/')))
+  .filter(p => p.id !== post.id)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 5);
+
+const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+
+// JSON-LD untuk Skema Berita Bisnis/Perusahaan
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "headline": post.data.title,
+  "description": post.data.description,
+  "image": [post.data.image],
+  "datePublished": post.data.pubDate.toISOString(),
+  "author": {
+    "@type": "Person",
+    "name": "Iqbal Maulana",
+    "jobTitle": "Head of Research"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Daily RWA"
+  }
+};
+---
+
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <SEO 
+        title={`${post.data.title} | Corporate Analysis`} 
+        description={post.data.description}
+        image={post.data.image}
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style is:global>
+        :root {
+            --comp-black: #111111;
+            --comp-gray: #555555;
+            --comp-bg: #f9fafb;
+        }
+        body { background-color: var(--comp-bg); color: var(--comp-black); font-family: 'Inter', sans-serif; }
+        
+        /* Typography Bisnis Kontemporer */
+        .prose-company { font-size: 1.125rem; line-height: 1.75; color: #374151; }
+        .prose-company h2 { font-weight: 800; font-size: 1.75rem; color: var(--comp-black); margin-top: 2.5rem; margin-bottom: 1rem; letter-spacing: -0.025em; }
+        .prose-company p { margin-bottom: 1.5rem; }
+        .prose-company strong { color: var(--comp-black); }
+        
+        .ad-container { background: #ffffff; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; position: relative; }
+        .ad-tag { position: absolute; top: 0; left: 50%; transform: translate(-50%, -100%); font-size: 9px; font-weight: 700; color: #9ca3af; text-transform: uppercase; }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- TOP HEADER -->
+    <header class="bg-black text-white py-6">
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-end">
+            <div>
+                <a href="/company" class="text-[10px] font-bold uppercase tracking-[0.3em] opacity-60 hover:opacity-100 transition-opacity">
+                    &larr; Corporate Intelligence
+                </a>
+                <h2 class="text-xs font-black uppercase mt-2 tracking-widest">Company Analysis</h2>
+            </div>
+            <div class="font-black italic text-2xl tracking-tighter">
+                DAILY <span class="text-slate-400 font-normal">RWA</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            
+            <!-- MAIN CONTENT -->
+            <div class="lg:col-span-8">
+                <h1 class="text-4xl md:text-5xl font-black leading-none mb-6 tracking-tight">
+                    {post.data.title}
+                </h1>
+
+                <div class="flex items-center gap-4 mb-10 text-[11px] font-bold uppercase text-slate-500 border-b pb-6">
+                    <span class="text-black">Iqbal Maulana</span>
+                    <span>•</span>
+                    <time>{formattedDate}</time>
+                </div>
+
+                <!-- AD 1: Top Hero Ad -->
+                <div class="ad-container w-full h-[120px] mb-12 bg-white shadow-sm">
+                    <span class="ad-tag">Advertisement</span>
+                    <div class="text-[10px] font-bold text-slate-200">728 x 90 LEADERBOARD</div>
+                </div>
+
+                {post.data.image && (
+                    <div class="mb-12">
+                        <img src={post.data.image} alt={post.data.title} class="w-full grayscale hover:grayscale-0 transition-all duration-700" />
+                    </div>
+                )}
+
+                <article class="prose-company max-w-none">
+                    <Content />
+                </article>
+
+                <!-- AD 2: Bottom Post Ad -->
+                <div class="mt-16 ad-container w-full py-12 bg-slate-100 border-dashed border-2">
+                    <span class="ad-tag">Sponsored Content</span>
+                    <div class="text-center italic text-slate-400 text-sm">
+                        Enterprise Solutions & Corporate Partners
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIDEBAR -->
+            <aside class="lg:col-span-4">
+                <div class="sticky top-10 space-y-12">
+                    
+                    <!-- AD 3: Sidebar Rectangular -->
+                    <div class="ad-container aspect-square w-full shadow-md bg-white">
+                        <span class="ad-tag">Partner</span>
+                        <div class="text-[10px] font-bold text-slate-200 uppercase">300 x 250 AD UNIT</div>
+                    </div>
+
+                    <!-- LATEST COMPANY UPDATES -->
+                    <div>
+                        <h3 class="font-black text-xs uppercase tracking-widest mb-6 py-2 border-y border-black">
+                            Latest Updates
+                        </h3>
+                        <div class="space-y-8">
+                            {latestCompanyNews.map(item => (
+                                <a href={`/company/${item.id.replace('company/', '')}`} class="group block">
+                                    <h4 class="font-bold text-sm leading-tight group-hover:text-blue-600 mb-2">
+                                        {item.data.title}
+                                    </h4>
+                                    <div class="flex justify-between items-center text-[9px] font-black opacity-40 uppercase">
+                                        <span>Company Report</span>
+                                        <span>{item.data.pubDate.toLocaleDateString()}</span>
+                                    </div>
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+
+                    <!-- NEWSLETTER BOX -->
+                    <div class="bg-black p-6 text-white">
+                        <h4 class="text-sm font-black uppercase mb-2">Executive Summary</h4>
+                        <p class="text-[11px] opacity-70 mb-4 leading-relaxed">Dapatkan ringkasan laporan perusahaan mingguan langsung ke email Anda.</p>
+                        <input type="email" placeholder="Work Email" class="w-full bg-zinc-800 border-none p-2 text-xs mb-2 focus:ring-1 ring-white outline-none" />
+                        <button class="w-full bg-white text-black font-black text-[10px] py-2 uppercase tracking-tighter hover:bg-zinc-200 transition-colors">Join List</button>
+                    </div>
+
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <Footer />
+</body>
+</html>

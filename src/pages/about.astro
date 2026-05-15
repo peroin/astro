@@ -1,0 +1,72 @@
+---
+// src/pages/about.astro
+import { getEntry, render } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+
+// 1. Ambil data dari content/pages/about.md
+const entry = await getEntry('pages', 'about');
+
+// Jika file tidak ditemukan, tampilkan error 404
+if (!entry) {
+  return Astro.redirect('/404');
+}
+
+// 2. Render konten Markdown menjadi HTML
+const { Content } = await render(entry);
+---
+
+<Layout title={entry.data.title} description={entry.data.description}>
+  <main class="max-w-4xl mx-auto px-4 py-20">
+    <header class="mb-16 border-b-8 border-black pb-8">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="bg-[#990000] text-white text-[9px] font-black uppercase tracking-[0.3em] px-2 py-0.5">
+          Institutional Profile
+        </span>
+      </div>
+      <h1 class="text-6xl font-black uppercase tracking-tighter italic text-black">
+        About <span class="text-[#990000]">Dailyrwa</span>
+      </h1>
+      <p class="text-xs font-bold text-gray-400 mt-4 uppercase tracking-[0.4em]">
+        Research & Analysis Division
+      </p>
+    </header>
+
+    <!-- Bagian Konten dari Markdown -->
+    <article class="prose prose-xl max-w-none 
+      prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight
+      prose-p:text-gray-700 prose-p:leading-relaxed 
+      prose-strong:text-black prose-strong:font-extrabold
+      prose-li:text-gray-600">
+      <Content />
+    </article>
+
+    <!-- Info Panel: Fokus pada Struktur Organisasi -->
+    <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="p-6 bg-black text-white rounded-xl shadow-xl">
+        <h4 class="text-[10px] font-black uppercase tracking-widest text-[#990000] mb-2">Director of Research</h4>
+        <p class="text-sm font-bold">Iqbal Maulana</p>
+        <p class="text-[10px] text-gray-500 mt-1">Strategic Oversight</p>
+      </div>
+      
+      <div class="p-6 border border-gray-200 bg-white rounded-xl">
+        <h4 class="text-[10px] font-black uppercase tracking-widest text-[#990000] mb-2">Established</h4>
+        <p class="text-sm font-bold text-black">April 2026</p>
+        <p class="text-[10px] text-gray-400 mt-1">Independent Intelligence</p>
+      </div>
+
+      <div class="p-6 border border-gray-200 bg-white rounded-xl">
+        <h4 class="text-[10px] font-black uppercase tracking-widest text-[#990000] mb-2">Technical Engine</h4>
+        <p class="text-sm font-bold text-black">AI Labs Indonesia</p>
+        <p class="text-[10px] text-gray-400 mt-1">Quantitative Systems</p>
+      </div>
+    </div>
+
+    <!-- Contact CTA (Opsional untuk kredibilitas tambahan) -->
+    <div class="mt-12 text-center border-t border-gray-100 pt-12">
+        <p class="text-xs text-gray-400 uppercase tracking-widest mb-4 font-bold">Institutional Inquiries</p>
+        <a href="mailto:contact@dailyrwa.com" class="text-black font-black text-xl hover:text-[#990000] transition-colors">
+            research@dailyrwa.com
+        </a>
+    </div>
+  </main>
+</Layout>

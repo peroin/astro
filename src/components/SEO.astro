@@ -1,0 +1,76 @@
+---
+// src/components/SEO.astro
+const { title, description, image = '/default-og.jpg', articleData } = Astro.props;
+
+const siteUrl = new URL('https://dailyrwa.io'); // Hardcode jika Astro.site belum di config
+const canonicalURL = new URL(Astro.url.pathname, siteUrl).toString().replace(/\/$/, "");
+
+// Logic Image URL (Tetap pertahankan logic Anda, ini sudah bagus)
+const formattedImage = image.startsWith('http') 
+    ? image 
+    : new URL(image, siteUrl).toString();
+
+// Schema Optimization
+const schema = articleData && articleData.pubDate ? {
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "headline": title,
+  "description": description,
+  "image": [formattedImage],
+  "datePublished": articleData.pubDate instanceof Date 
+    ? articleData.pubDate.toISOString() 
+    : new Date(articleData.pubDate).toISOString(),
+  "dateModified": articleData.updatedDate ? new Date(articleData.updatedDate).toISOString() : undefined,
+  "author": [{
+      "@type": "Person",
+      "name": articleData.author || "Iqbal Maulana",
+      "jobTitle": "Head of Research",
+      "url": `${siteUrl}authors/iqbal-maulana`,
+      "sameAs": [
+        "https://github.com/yusuf", // Ganti dengan profil asli Anda
+        "https://linkedin.com/in/iqbalmaulana" 
+      ]
+    }],
+  "publisher": {
+    "@type": "Organization",
+    "name": "Daily RWA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${siteUrl}logo.png`
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": canonicalURL
+  }
+} : {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Daily RWA",
+  "url": siteUrl.toString()
+};
+---
+
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalURL} />
+
+<meta name="author" content={articleData?.author || "Iqbal Maulana"} />
+
+<meta property="og:type" content={articleData ? 'article' : 'website'} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={formattedImage} />
+
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={canonicalURL} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<meta property="twitter:image" content={formattedImage} />
+
+<meta name="robots" content="index, follow" />
+<meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(schema)} />

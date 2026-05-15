@@ -1,0 +1,70 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="bg-[#1a1a1a] text-white pt-16 pb-8 mt-20 border-t-4 border-[#990000]">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            
+            <!-- Brand & Mission -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-serif font-black italic tracking-tighter">
+                    DAILY <span class="text-[#990000]">RWA</span>
+                </h2>
+                <p class="text-gray-400 text-sm leading-relaxed max-w-xs">
+                    Memberikan analisis mendalam mengenai tokenisasi Real World Assets (RWA) dan intelijen pasar institusional global.
+                </p>
+            </div>
+
+            <!-- Mandatory Links (Google Standard) -->
+            <div class="space-y-4">
+                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-[#990000]">Legal & Transparency</h3>
+                <ul class="space-y-2 text-sm text-gray-300">
+                    <li><a href="/about" class="hover:text-white transition-colors">About Us</a></li>
+                    <li><a href="/editorial-guidelines" class="hover:text-white transition-colors">Editorial Guidelines</a></li>
+                    <li><a href="/privacy-policy" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                    <li><a href="/terms" class="hover:text-white transition-colors">Terms of Service</a></li>
+                    <li><a href="/contact" class="hover:text-white transition-colors">Contact Intelligence Desk</a></li>
+                </ul>
+            </div>
+
+            <!-- Compliance & Disclaimer -->
+            <div class="space-y-4">
+                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-[#990000]">Financial Disclaimer</h3>
+                <p class="text-[11px] text-gray-500 leading-relaxed italic">
+                    Konten yang disajikan di Daily RWA bersifat informasi dan edukasi semata. Kami bukan penasihat keuangan terdaftar. Investasi pada aset kripto dan RWA memiliki risiko tinggi. Selalu lakukan riset mandiri sebelum mengambil keputusan finansial.
+                </p>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+                © {currentYear} ChainPulse Network. All Rights Reserved.
+            </p>
+            
+            <!-- Social/Verification -->
+            <div class="flex gap-6">
+                <a href="#" class="text-gray-500 hover:text-white text-[10px] font-bold uppercase tracking-widest">Twitter / X</a>
+                <a href="#" class="text-gray-500 hover:text-white text-[10px] font-bold uppercase tracking-widest">LinkedIn</a>
+                <a href="#" class="text-gray-500 hover:text-white text-[10px] font-bold uppercase tracking-widest">RSS Feed</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Sticky Ad Component (Kenyamanan Pengguna) -->
+<div class="fixed bottom-0 left-0 w-full bg-white/95 border-t border-gray-200 py-2 z-50 shadow-2xl hidden md:block" id="sticky-ad">
+    <div class="max-w-4xl mx-auto px-4 flex justify-between items-center">
+        <span class="text-[8px] font-bold text-gray-400 uppercase vertical-text border-r border-gray-200 pr-2 mr-2">Advertisement</span>
+        <div class="flex-grow text-center">
+            <!-- Slot Iklan 728x90 -->
+            <div class="h-[90px] bg-gray-50 flex items-center justify-center text-gray-300 text-[10px] tracking-widest border border-dashed border-gray-200">
+                LEADERBOARD AD SLOT
+            </div>
+        </div>
+        <button onclick="document.getElementById('sticky-ad').remove()" class="ml-4 text-gray-400 hover:text-black">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+</div>

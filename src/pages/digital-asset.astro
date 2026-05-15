@@ -1,0 +1,234 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CryptoBentoGrid from '../components/CryptoBentoGrid.jsx';
+import CryptoChart from '../components/CryptoChart.jsx';
+import LiveTicker from '../components/LiveTicker.jsx';
+import TokenomicsCalculator from '../components/TokenomicsCalculator.jsx';
+import MarketSentiment from '../components/MarketSentiment.jsx';
+
+// Komponen RWA & E-E-A-T
+import RWAYieldTable from '../components/RWAYieldTable.jsx';
+import TVLChart from '../components/TVLChart.jsx';
+import AuthorBio from '../components/AuthorBio.astro';
+import RWALiveTable from '../components/RWALiveTable.jsx';
+
+// Import Footer dari path yang benar
+import Footer from '../components/Footer.astro';
+
+// SEO & Metadata - DailyRWA
+const title = "Digital Assets & RWA Intelligence | DailyRWA";
+const description = "Analisis on-chain mendalam untuk aset digital dan real-world assets. Bagian dari DailyRWA Network.";
+
+// Definisi Menu Navbar DailyRWA
+const navMenu = [
+  { name: "Home", href: "/" },
+  { name: "World", href: "/world" },
+  { name: "Market", href: "/market" },
+  { name: "Company", href: "/company" },
+  { name: "Digital Asset", href: "/digital-asset", active: true },
+];
+
+const toc = [
+  { id: "market-analysis", title: "Market Analysis" },
+  { id: "rwa-analytics", title: "RWA On-Chain" },
+  { id: "yield-aggregator", title: "Yield Aggregator" },
+  { id: "valuation-sandbox", title: "RWA Sandbox" },
+];
+---
+
+<Layout title={title} description={description}>
+    <!-- DAILYRWA GLOBAL NAVBAR -->
+    <header class="fixed top-0 w-full z-[110] bg-[#fffcf5]/90 backdrop-blur-md border-b border-black/10">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 group">
+                <span class="text-xl font-black tracking-tighter text-black uppercase italic transition-colors">
+                    Daily<span class="text-[#990000] font-sans not-italic">RWA</span>
+                </span>
+            </a>
+
+            <nav class="hidden md:flex items-center gap-8">
+                {navMenu.map(item => (
+                    <a 
+                        href={item.href} 
+                        class={`text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${item.active ? 'text-[#990000] border-b-2 border-[#990000]' : 'text-gray-500 hover:text-black'}`}
+                    >
+                        {item.name}
+                    </a>
+                ))}
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex flex-col items-end">
+                    <span class="text-[8px] font-bold text-[#990000] uppercase tracking-widest leading-none">Market Open</span>
+                    <span class="text-[9px] font-mono text-gray-400 uppercase">24/7 Intel</span>
+                </div>
+                <div class="h-8 w-[1px] bg-black/10 mx-2"></div>
+                <button class="text-black hover:text-[#990000] transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-[80vh] w-full overflow-hidden flex flex-col justify-center items-center pt-24 pb-20 bg-[#fffcf5]">
+        <div class="absolute inset-0 z-0 opacity-20 grayscale">
+            <img 
+                src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2832&auto=format&fit=crop" 
+                alt="DailyRWA Asset Intelligence" 
+                class="w-full h-full object-cover" 
+                loading="eager"
+            />
+            <div class="absolute inset-0 bg-[#fffcf5]/40"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-6 text-center">
+            <div class="flex items-center justify-center gap-3 mb-10 animate-fade-in">
+                <div class="h-[1px] w-12 bg-black/20"></div>
+                <span class="text-[10px] font-black tracking-[0.5em] text-black uppercase font-mono italic">Sector: Digital Asset</span>
+                <div class="h-[1px] w-12 bg-black/20"></div>
+            </div>
+            
+            <h1 class="text-6xl md:text-[9rem] font-serif font-black tracking-tighter leading-[0.85] mb-8 animate-reveal uppercase italic text-black">
+                CRYPTO
+            </h1>
+            
+            <p class="max-w-2xl mx-auto text-gray-700 text-base md:text-xl leading-relaxed font-medium mb-12 animate-fade-in font-sans">
+                Laporan pasar aset digital dan real-world asset (RWA) ter-tokenisasi. Bagian eksklusif dari portal berita <span class="text-[#990000] font-bold">DailyRWA</span>.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                 <a href="#market-analysis" class="w-full sm:w-auto px-10 py-4 bg-black text-white font-black rounded-none hover:bg-[#990000] transition-all shadow-xl uppercase text-[10px] tracking-[0.2em] active:scale-95 text-center">Live Market Feed</a>
+                 <a href="#rwa-analytics" class="w-full sm:w-auto px-10 py-4 bg-white text-black text-center font-black rounded-none border-2 border-black hover:bg-gray-50 transition-all uppercase text-[10px] tracking-[0.2em] active:scale-95">RWA Analytics</a>
+            </div>
+        </div>
+
+        <div class="absolute bottom-0 w-full border-y border-black/10 bg-white py-4 overflow-hidden group">
+            <LiveTicker client:load />
+        </div>
+    </section>
+
+    <main class="relative z-10 bg-white">
+        
+        <section id="market-analysis" class="max-w-7xl mx-auto px-6 py-16 md:py-24 space-y-12 scroll-mt-32">
+            <div class="flex items-center gap-4">
+                <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-[#990000] font-mono italic whitespace-nowrap">Asset Performance Matrix</h2>
+                <div class="h-[1px] flex-grow bg-black/10"></div>
+            </div>
+            <div class="bg-white rounded-none p-4 md:p-10 border border-gray-200 shadow-sm min-h-[300px]">
+                <CryptoBentoGrid client:only="react" />
+            </div>
+            <div class="rounded-none overflow-hidden border border-gray-200 bg-white shadow-sm h-[500px] md:h-[650px]">
+                <CryptoChart client:visible />
+            </div>
+        </section>
+
+        <!-- Section RWA Analytics -->
+        <section id="rwa-analytics" class="max-w-7xl mx-auto px-6 py-16 scroll-mt-32">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16">
+                <div class="lg:col-span-5 space-y-6 text-center lg:text-left">
+                    <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-[#990000] font-mono italic">Liquidity Tracking</h2>
+                    <h3 class="text-4xl md:text-5xl font-serif font-bold text-black uppercase tracking-tighter italic">RWA Sector <br/>Analytics</h3>
+                    <p class="text-gray-600 leading-relaxed font-sans text-lg">Pemantauan likuiditas on-chain pada protokol aset dunia nyata.</p>
+                </div>
+                
+                <div class="lg:col-span-7 bg-black rounded-none p-6 border border-black shadow-2xl min-h-[450px]">
+                    <div class="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
+                        <span class="text-[10px] font-bold text-white uppercase tracking-[0.2em] font-mono">Real-Time TVL Data</span>
+                        <div class="flex gap-2">
+                            <div class="w-2 h-2 rounded-full bg-[#990000] animate-pulse"></div>
+                            <div class="w-2 h-2 rounded-full bg-zinc-800"></div>
+                        </div>
+                    </div>
+                    <TVLChart client:only="react" />
+                </div>
+            </div>
+
+            <div class="rounded-none border border-black bg-black overflow-hidden shadow-sm">
+                <div class="p-0 text-white">
+                     <RWALiveTable client:load />
+                </div>
+            </div>
+        </section>
+
+        <section id="yield-aggregator" class="bg-[#fffcf5] py-20 border-y border-gray-200 scroll-mt-32">
+            <div class="max-w-7xl mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-5xl font-serif font-black text-black uppercase italic tracking-tighter mb-8">Yield Aggregator</h2>
+                <div class="bg-white p-4 border border-gray-200 shadow-md max-w-4xl mx-auto">
+                    <RWAYieldTable client:load />
+                </div>
+            </div>
+        </section>
+
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16 py-16">
+            <aside class="hidden lg:block lg:col-span-3 sticky top-32 h-fit">
+                <nav class="space-y-8">
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 mb-6 font-mono">Quick Navigation</p>
+                    <ul class="space-y-4">
+                        {toc.map(item => (
+                            <li>
+                                <a href={`#${item.id}`} class="toc-link group flex items-center gap-3 text-[11px] font-bold text-gray-500 hover:text-[#990000] transition-all font-sans uppercase tracking-widest">
+                                    <span class="h-[1px] w-4 bg-gray-300 indicator-line group-hover:bg-[#990000]"></span>
+                                    {item.title}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+            </aside>
+
+            <div class="lg:col-span-9">
+                <article class="prose prose-slate max-w-none">
+                    <section id="valuation-sandbox" class="mb-32 scroll-mt-32">
+                        <div class="mb-10">
+                            <h2 class="text-4xl font-serif font-black text-black mb-6 uppercase tracking-tight italic border-b-4 border-black inline-block">RWA Sandbox</h2>
+                            <div class="bg-white border-2 border-black rounded-none p-3 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-h-[550px] overflow-y-auto overflow-x-hidden custom-scrollbar">
+                                <TokenomicsCalculator client:only="react" />
+                            </div>
+                        </div>
+                    </section>
+                    <div class="border-t-2 border-black pt-10">
+                        <AuthorBio />
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <!-- FOOTER KOMPONEN -->
+        <Footer />
+    </main>
+</Layout>
+
+<style is:global>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;600;900&display=swap');
+    
+    html { 
+        scroll-behavior: smooth; 
+        background-color: #fffcf5; 
+        font-family: 'Inter', sans-serif;
+    }
+
+    .font-serif { font-family: 'Playfair Display', serif; }
+
+    /* Custom scrollbar untuk internal box kalkulator agar tetap estetik */
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #000; }
+
+    #rwa-analytics table { color: #ffffff !important; }
+    #rwa-analytics th { color: #990000 !important; font-weight: 900; }
+    #rwa-analytics td { border-color: rgba(255,255,255,0.1) !important; }
+
+    .animate-reveal { animation: reveal 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards; }
+    @keyframes reveal {
+        0% { transform: translateY(50px); opacity: 0; filter: blur(15px); }
+        100% { transform: translateY(0); opacity: 1; filter: blur(0); }
+    }
+    .animate-fade-in { animation: fadeIn 1.5s ease-out forwards; }
+    @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #fffcf5; }
+    ::-webkit-scrollbar-thumb { background: #d2d2d2; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #990000; }
+</style>

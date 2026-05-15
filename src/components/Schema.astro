@@ -1,0 +1,38 @@
+---
+// src/components/Schema.astro
+const { post } = Astro.props;
+
+// Konfigurasi dasar
+const siteName = "Daily RWA";
+const authorName = "Iqbal Maulana"; // Nama profesional Anda
+const siteUrl = "https://chainpulse.io"; // Berdasarkan nama proyek RWA Anda
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "AnalysisNewsArticle", // Spesifik untuk analisis pasar
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": `${siteUrl}/market/${post.id.replace('market/', '')}`
+  },
+  "headline": post.data.title,
+  "description": post.data.description,
+  "image": post.data.image,
+  "datePublished": post.data.pubDate.toISOString(),
+  "dateModified": post.data.pubDate.toISOString(),
+  "author": {
+    "@type": "Person",
+    "name": authorName,
+    "url": `${siteUrl}/about` // Link ke profil profesional Anda
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": siteName,
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${siteUrl}/logo.png`
+    }
+  }
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
