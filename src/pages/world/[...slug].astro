@@ -1,5 +1,6 @@
 ---
-import { getCollection, render } from 'astro:content';
+// src/pages/world/[...slug].astro
+import { getCollection } from 'astro:content'; 
 import SEO from '../../components/SEO.astro';
 import Footer from '../../components/Footer.astro';
 
@@ -8,16 +9,24 @@ export async function getStaticPaths() {
     return id.startsWith('world/');
   });
 
-  return worldPosts.map(post => ({
-    params: { 
-      slug: post.id.replace('world/', '') 
-    },
-    props: { post },
-  }));
+  return worldPosts.map(post => {
+    // Perbaikan v4: Menggunakan regex /^world\// agar subfolder berlapis di dalam Obsidian
+    // terpotong dengan bersih dan menghasilkan slug yang akurat
+    const cleanSlug = post.id
+      .replace(/^world\//, '')
+      .replace(/\.mdx?$/, '');
+
+    return {
+      params: { slug: cleanSlug },
+      props: { post },
+    };
+  });
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+
+// Perbaikan v4: Jalankan fungsi render langsung dari objek konten
+const { Content } = await post.render();
 
 // Mengambil berita terbaru khusus kategori World
 const latestWorldNews = (await getCollection('blog', ({ id }) => id.startsWith('world/')))
@@ -31,7 +40,7 @@ const formattedDate = post.data.pubDate.toLocaleDateString('en-GB', {
   year: 'numeric'
 });
 
-// JSON-LD untuk Skema Berita Dunia
+// JSON-LD Skema Berita Dunia untuk optimasi E-E-A-T Google
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "NewsArticle",
@@ -41,7 +50,12 @@ const jsonLd = {
   "datePublished": post.data.pubDate.toISOString(),
   "author": {
     "@type": "Person",
-    "name": "Iqbal Maulana"
+    "name": "Iqbal Maulana",
+    "url": "https://chainpulse.io/author/iqbal-maulana"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Daily RWA"
   }
 };
 ---
@@ -56,7 +70,7 @@ const jsonLd = {
         image={post.data.image}
     />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     
     <style is:global>
         :root {
@@ -67,9 +81,12 @@ const jsonLd = {
         
         /* Typography khusus artikel World News menggunakan Lora agar nyaman dibaca lama */
         .prose-world { font-family: 'Lora', serif; font-size: 1.2rem; line-height: 1.9; color: #222; }
-        .prose-world h2 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; margin-top: 3rem; margin-bottom: 1.5rem; color: var(--world-blue); }
+        .prose-world h2 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; margin-top: 3rem; margin-bottom: 1.5rem; color: var(--world-blue); border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
         .prose-world p { margin-bottom: 1.8rem; }
+        .prose-world strong { font-weight: 700; color: #000; }
         .prose-world blockquote { border-left: 5px solid var(--world-blue); padding: 1rem 2rem; font-style: italic; background: #f8fafc; margin: 3rem 0; font-size: 1.3rem; }
+        .prose-world ul { list-style-type: square; margin-left: 1.5rem; margin-bottom: 1.8rem; }
+        .prose-world li { margin-bottom: 0.5rem; }
         
         .ad-box { background: #f3f4f6; border: 1px solid #e5e7eb; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         .ad-label { font-size: 9px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
@@ -81,7 +98,7 @@ const jsonLd = {
     <!-- NAVBAR -->
     <nav class="border-b-4 border-[var(--world-blue)] py-5 bg-white sticky top-0 z-50 shadow-sm">
         <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
-            <a href="/world" class="font-black text-[10px] uppercase tracking-[0.2em] text-slate-500 hover:text-[var(--world-blue)] transition-colors">
+            <a href="/world" class="font-black text-[10px] uppercase tracking-[0.2em] text-slate-500 hover:text-[var(--world-blue)] transition-colors flex items-center gap-1">
                 &larr; World Section
             </a>
             <div class="font-serif font-black italic text-2xl">
@@ -99,7 +116,7 @@ const jsonLd = {
                     <div class="inline-block text-[var(--world-blue)] font-black text-[11px] uppercase tracking-widest border-b-2 border-[var(--world-blue)] mb-6">
                         Global Report
                     </div>
-                    <h1 class="text-4xl md:text-6xl font-serif font-black leading-tight mb-8">
+                    <h1 class="text-4xl md:text-6xl font-serif font-black leading-tight mb-8 text-slate-900 tracking-tight">
                         {post.data.title}
                     </h1>
                     <div class="flex items-center justify-center lg:justify-start gap-6 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
@@ -111,13 +128,13 @@ const jsonLd = {
                 <!-- AD 1: Leaderboard Top -->
                 <div class="ad-box w-full py-8 mb-10">
                     <span class="ad-label">Advertisement</span>
-                    <div class="text-xs text-slate-300 uppercase">Banner Desktop / Tablet 728x90</div>
+                    <div class="text-xs text-slate-300 uppercase font-mono">Banner Desktop / Tablet 728x90</div>
                 </div>
 
                 {post.data.image && (
-                    <figure class="mb-12">
-                        <img src={post.data.image} alt={post.data.title} class="w-full h-auto shadow-2xl" />
-                        <figcaption class="mt-4 text-[11px] text-slate-400 italic font-medium leading-relaxed">
+                    <figure class="mb-12 border border-slate-100 p-2 bg-white shadow-sm">
+                        <img src={post.data.image} alt={post.data.title} class="w-full h-auto object-cover" />
+                        <figcaption class="mt-4 text-[11px] text-slate-400 italic font-medium leading-relaxed px-1">
                             Reporting from the frontlines of global shifts. © 2026 Daily RWA World Intelligence.
                         </figcaption>
                     </figure>
@@ -130,7 +147,7 @@ const jsonLd = {
                 <!-- AD 2: Mid-Article Native -->
                 <div class="my-16 ad-box w-full p-10 bg-slate-50 border-double border-4 border-slate-200">
                     <span class="ad-label">Sponsored Intelligence</span>
-                    <div class="text-center font-serif italic text-slate-500">
+                    <div class="text-center font-serif italic text-slate-500 text-sm">
                         Space for Native Recommendations or High-Impact Display Ads
                     </div>
                 </div>
@@ -143,7 +160,7 @@ const jsonLd = {
                     <!-- AD 3: Sidebar Skyscraper -->
                     <div class="ad-box w-full min-h-[400px]">
                         <span class="ad-label">Global Partner Ad</span>
-                        <div class="text-xs text-slate-300">Vertical Ad Unit</div>
+                        <div class="text-xs text-slate-300 font-mono">Vertical Ad Unit</div>
                     </div>
 
                     <!-- LATEST WORLD NEWS -->
@@ -152,26 +169,33 @@ const jsonLd = {
                             Recent Reports
                         </h3>
                         <div class="space-y-10">
-                            {latestWorldNews.map(news => (
-                                <a href={`/world/${news.id.replace('world/', '')}`} class="group block">
-                                    <h4 class="font-serif font-bold text-lg leading-snug group-hover:text-[var(--world-blue)] group-hover:underline transition-all">
-                                        {news.data.title}
-                                    </h4>
-                                    <p class="text-[10px] font-black text-slate-400 mt-3 uppercase tracking-tighter">
-                                        {news.data.pubDate.toLocaleDateString('id-ID')}
-                                    </p>
-                                </a>
-                            ))}
+                            {latestWorldNews.map(news => {
+                                // Perbaikan v4: Menggunakan regex /^world\// agar penanganan subfolder berlapis konsisten di sidebar
+                                const cleanNewsSlug = news.id
+                                  .replace(/^world\//, '')
+                                  .replace(/\.mdx?$/, '');
+
+                                return (
+                                    <a href={`/world/${cleanNewsSlug}`} class="group block border-b border-slate-100 pb-4 last:border-none">
+                                        <h4 class="font-serif font-bold text-lg leading-snug group-hover:text-[var(--world-blue)] transition-colors">
+                                            {news.data.title}
+                                        </h4>
+                                        <p class="text-[10px] font-black text-slate-400 mt-3 uppercase tracking-tighter">
+                                            {news.data.pubDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        </p>
+                                    </a>
+                                );
+                            })}
                         </div>
                     </section>
 
                     <!-- QUICK LINKS -->
-                    <div class="bg-slate-900 p-8 text-white">
+                    <div class="bg-slate-900 p-8 text-white rounded-none">
                         <h5 class="font-black text-[10px] uppercase tracking-widest mb-4 opacity-50">Global Network</h5>
-                        <ul class="text-xs space-y-3 font-bold">
-                            <li><a href="/market" class="hover:text-[var(--world-blue)]">&rarr; Market Dashboard</a></li>
-                            <li><a href="/company" class="hover:text-[var(--world-blue)]">&rarr; Corporate Intelligence</a></li>
-                            <li><a href="/" class="hover:text-[var(--world-blue)]">&rarr; Main Terminal</a></li>
+                        <ul class="text-xs space-y-3 font-bold font-inter">
+                            <li><a href="/market" class="hover:text-sky-400 transition-colors">&rarr; Market Dashboard</a></li>
+                            <li><a href="/company" class="hover:text-sky-400 transition-colors">&rarr; Corporate Intelligence</a></li>
+                            <li><a href="/" class="hover:text-sky-400 transition-colors">&rarr; Main Terminal</a></li>
                         </ul>
                     </div>
 

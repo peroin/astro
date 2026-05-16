@@ -17,11 +17,12 @@ const mostPopular = marketPosts.slice(0, 8);
 const getCategoryPosts = (slug: string) => marketPosts.filter(post => post.id.includes(`market/${slug}/`));
 const getUrl = (id: string) => `/market/${id.replace('market/', '')}`;
 
+// PERBAIKAN: Menyelaraskan ID agar cocok 100% dengan KATEGORI_PROJECT di Keystatic Anda
 const categories = [
-    { id: 'rwa', label: 'RWA Tokens' },
-    { id: 'stocks', label: 'US Stocks' },
-    { id: 'crypto', label: 'Digital Assets' },
+    { id: 'us-stocks', label: 'US Stocks' },         // Diubah dari stocks -> us-stocks
     { id: 'currencies', label: 'Currencies' },
+    { id: 'rwa-tokens', label: 'RWA Tokens' },       // Diubah dari rwa -> rwa-tokens
+    { id: 'digital-asset', label: 'Digital Assets' }, // Diubah dari crypto -> digital-asset
     { id: 'commodities', label: 'Commodities' }
 ];
 
@@ -39,40 +40,51 @@ const marketHours = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <SEO title="Market Intelligence | Daily RWA" description="Analisis ekonomi mendalam dan data pasar real-time." />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght=0,700;0,900;1,700&family=Inter:wght=400;500;700;900&family=JetBrains+Mono:wght=500&display=swap" rel="stylesheet">
     
     <style is:global>
         :root {
-            --wsj-bg: #fffcf5;
-            --wsj-black: #1a1a1a;
-            --brand-red: #990000;
+            --modern-bg: #f8f9fa; /* Off-White yang teduh di mata */
+            --modern-black: #333333; /* Dark Charcoal lembut sebagai pengganti hitam pekat */
+            --brand-red: #ff3333; /* Merah aksen kontemporer */
         }
-        body { background-color: var(--wsj-bg); color: var(--wsj-black); font-family: 'Inter', sans-serif; }
+        body { 
+            background-color: var(--modern-bg) !important; 
+            color: var(--modern-black); 
+            font-family: 'Inter', sans-serif; 
+        }
         .font-serif { font-family: 'Playfair Display', serif; }
-        .wsj-double-rule { border-top: 3px double #000; }
-        .wsj-thin-rule { border-top: 1px solid #d2d2d2; }
-        .column-divider { border-right: 1px solid #e0e0e0; }
+        .wsj-double-rule { border-top: 3px double var(--modern-black); }
+        .wsj-thin-rule { border-top: 1px solid rgba(51, 51, 51, 0.15); }
+        .column-divider { border-right: 1px solid rgba(51, 51, 51, 0.15); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .tv-widget-box { background: #ffffff; border: 1px solid #e0e3eb; border-radius: 4px; overflow: hidden; }
+        .tv-widget-box { background: #ffffff; border: 1px solid rgba(51, 51, 51, 0.1); border-radius: 6px; overflow: hidden; shadow: 0 1px 3px rgba(0,0,0,0.02); }
 
         @media (max-width: 1024px) {
-            .column-divider { border-right: none; border-bottom: 1px solid #e0e0e0; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+            .column-divider { border-right: none; border-bottom: 1px solid rgba(51, 51, 51, 0.15); padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
         }
+
+        /* Custom Scrollbar subtle */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--modern-bg); }
+        ::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--modern-black); }
     </style>
 </head>
 
-<body class="antialiased">
+<body class="antialiased selection:bg-[#333333] selection:text-white">
 
+    <!-- HEADER -->
     <header class="max-w-7xl mx-auto px-4 pt-6 pb-4 text-center">
-        <a href="/" class="inline-block">
-            <h1 class="text-5xl md:text-6xl font-serif font-black italic tracking-tighter text-slate-900">
-                DAILY <span class="text-[#990000]">RWA</span>
+        <a href="/" class="inline-block group">
+            <h1 class="text-4xl md:text-5xl font-serif font-black italic tracking-tighter text-[#333333] transition-colors group-hover:text-black">
+                DAILY <span class="text-[#ff3333] not-italic">RWA</span>
             </h1>
         </a>
     </header>
 
-    <!-- TICKER TAPE (Hanya menggunakan data Liquid: Kripto, Forex, Saham) -->
-    <div class="border-y border-black bg-white">
+    <!-- TICKER TAPE -->
+    <div class="border-y border-[#333333]/20 bg-white">
         <div class="tradingview-widget-container">
             <div class="tradingview-widget-container__widget"></div>
             <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async is:inline>
@@ -95,22 +107,33 @@ const marketHours = [
         </div>
     </div>
 
-    <nav class="border-b border-black bg-[#fffcf5] sticky top-0 z-50">
+    <!-- MAIN NAV (Top Anchor Gelap dipertahankan untuk kontras struktural) -->
+    <nav class="bg-[#0d0d0d] sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto px-4">
-            <ul class="flex justify-center items-center gap-6 md:gap-8 py-3 text-[11px] font-black uppercase tracking-[0.2em] overflow-x-auto no-scrollbar">
-                <li><a href="/" class="hover:text-[#990000] whitespace-nowrap">Home</a></li>
-                <li><a href="/market" class="text-[#990000] whitespace-nowrap">Market Intelligence</a></li>
+            <ul class="flex justify-center items-center gap-6 md:gap-8 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] overflow-x-auto no-scrollbar">
+                <li><a href="/" class="text-gray-400 hover:text-white transition-colors whitespace-nowrap">Home</a></li>
+                <li><a href="/market" class="text-white border-b-2 border-[#ff3333] pb-1 whitespace-nowrap">Market Intelligence</a></li>
                 {categories.map(cat => (
-                    <li><a href={`#${cat.id}`} class="hover:text-[#990000] whitespace-nowrap text-slate-700">{cat.label}</a></li>
+                    <li><a href={`#${cat.id}`} class="text-gray-400 hover:text-white transition-colors whitespace-nowrap">{cat.label}</a></li>
                 ))}
             </ul>
         </div>
     </nav>
 
+    <!-- PLACEMENT IKLAN 1: BILLBOARD AD (Top Page Banner) -->
+    <div class="max-w-7xl mx-auto px-4 mt-6">
+        <div class="w-full bg-white border border-[#333333]/10 py-6 text-center flex flex-col items-center justify-center rounded-lg shadow-sm">
+            <span class="text-[8px] font-black tracking-widest text-gray-400 uppercase mb-1">Sponsored Advertisement</span>
+            <div class="text-xs font-mono font-medium text-gray-500 bg-[#f8f9fa] border border-[#333333]/5 px-8 py-2 shadow-sm rounded">
+                Leaderboard Ad Space (e.g., 728x90 or Flexible Responsive)
+            </div>
+        </div>
+    </div>
+
     <main class="max-w-7xl mx-auto px-4 mt-8">
         
-        <!-- MARKET OVERVIEW (Tanpa US10Y & IEF) -->
-        <div class="mb-8 border-b border-black pb-6">
+        <!-- MARKET OVERVIEW -->
+        <div class="mb-8 border-b border-[#333333]/20 pb-6">
             <div class="tv-widget-box">
                 <div class="tradingview-widget-container">
                     <div class="tradingview-widget-container__widget"></div>
@@ -148,18 +171,18 @@ const marketHours = [
         <!-- MARKET STATUS BOARD -->
         <section class="mb-12">
           <div class="flex justify-between items-center mb-4">
-            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Global Session Monitor (UTC)</h3>
-            <div id="utc-clock" class="text-[10px] font-mono font-bold bg-black text-white px-2 py-1">--:--:-- UTC</div>
+            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Global Session Monitor (UTC)</h3>
+            <div id="utc-clock" class="text-[10px] font-mono font-bold bg-[#333333] text-white px-2.5 py-1 rounded">--:--:-- UTC</div>
           </div>
           <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
             {marketHours.map((m) => (
-              <div class="bg-white border border-gray-200 p-3 shadow-sm flex flex-col justify-between">
+              <div class="bg-white border border-[#333333]/10 p-3 shadow-sm flex flex-col justify-between rounded-lg">
                 <div class="flex justify-between items-start">
                   <span class="text-[8px] font-bold text-gray-400 uppercase tracking-tighter">{m.type}</span>
                   <div class={`status-dot-${m.name.replace(/\s+/g, '-')} w-2 h-2 rounded-full bg-gray-300 animate-pulse`}></div>
                 </div>
-                <h4 class="font-black text-xs uppercase italic my-1">{m.name}</h4>
-                <div class={`status-label-${m.name.replace(/\s+/g, '-')} text-[8px] font-black uppercase py-1 text-center bg-gray-100`}>
+                <h4 class="font-black text-xs uppercase italic my-1 text-[#333333]">{m.name}</h4>
+                <div class={`status-label-${m.name.replace(/\s+/g, '-')} text-[8px] font-black uppercase py-1 text-center bg-[#f8f9fa] rounded-sm`}>
                   Syncing...
                 </div>
               </div>
@@ -170,37 +193,39 @@ const marketHours = [
         <!-- KONTEN BLOG -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
             <section class="lg:col-span-8 column-divider lg:pr-8">
-                {mainHeadline ? (
-                    <article>
+                {marketPosts.length > 0 && mainHeadline ? (
+                    <article class="bg-white border border-[#333333]/10 p-5 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
                         <div class="flex flex-col-reverse md:flex-row gap-6 mb-6">
-                            <div class="md:w-1/3">
-                                <a href={getUrl(mainHeadline.id)}>
-                                    <h2 class="text-2xl md:text-3xl font-serif font-bold leading-tight mb-3 hover:text-[#990000] text-slate-900">
-                                        {mainHeadline.data.title}
-                                    </h2>
-                                </a>
-                                <p class="text-xs text-gray-700 leading-relaxed mb-4">{mainHeadline.data.description}</p>
-                                <span class="text-[9px] font-bold text-[#990000] uppercase border-t border-[#990000] pt-1">Priority Analysis</span>
+                            <div class="md:w-1/3 flex flex-col justify-between">
+                                <div>
+                                    <a href={getUrl(mainHeadline.id)}>
+                                        <h2 class="text-2xl md:text-3xl font-serif font-bold leading-tight mb-3 hover:text-[#ff3333] text-[#333333] transition-colors">
+                                            {mainHeadline.data.title}
+                                        </h2>
+                                    </a>
+                                    <p class="text-xs text-gray-600 leading-relaxed mb-4 font-medium">{mainHeadline.data.description}</p>
+                                </div>
+                                <span class="text-[9px] font-bold text-[#ff3333] uppercase border-t border-[#ff3333] pt-1.5 self-start">Priority Analysis</span>
                             </div>
                             <div class="md:w-2/3">
-                                <div class="aspect-video overflow-hidden border border-gray-200 shadow-sm">
-                                    <img src={mainHeadline.data.image} alt={mainHeadline.data.title} class="w-full h-full object-cover" />
+                                <div class="aspect-video overflow-hidden border border-[#333333]/5 shadow-sm rounded-lg">
+                                    <img src={mainHeadline.data.image} alt={mainHeadline.data.title} class="w-full h-full object-cover transition-transform duration-700 hover:scale-102" />
                                 </div>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 wsj-thin-rule pt-6">
                             {topStories.map(post => (
-                                <article>
-                                    <a href={getUrl(post.id)} class="group">
-                                        <h3 class="text-sm font-bold leading-tight mb-1 group-hover:underline text-slate-900">{post.data.title}</h3>
-                                        <p class="text-[10px] text-gray-500 line-clamp-2">{post.data.description}</p>
+                                <article class="group">
+                                    <a href={getUrl(post.id)}>
+                                        <h3 class="text-sm font-bold leading-tight mb-1 group-hover:text-[#ff3333] text-[#333333] transition-all">{post.data.title}</h3>
+                                        <p class="text-[10px] text-gray-500 line-clamp-2 font-medium">{post.data.description}</p>
                                     </a>
                                 </article>
                             ))}
                         </div>
                     </article>
                 ) : (
-                    <div class="p-10 border-2 border-dashed border-gray-200 text-center text-gray-400 italic font-serif">
+                    <div class="p-10 border-2 border-dashed border-[#333333]/10 bg-white text-center text-gray-400 italic font-serif rounded-xl">
                         No Market Intelligence Content Available.
                     </div>
                 )}
@@ -208,7 +233,7 @@ const marketHours = [
 
             <aside class="lg:col-span-4">
                 <div class="mb-10">
-                    <h4 class="text-[10px] font-black uppercase tracking-widest mb-4 border-b-2 border-black pb-1 text-black">Economic Calendar</h4>
+                    <h4 class="text-[10px] font-black uppercase tracking-widest mb-4 border-b-2 border-[#333333] pb-1 text-[#333333]">Economic Calendar</h4>
                     <div class="tv-widget-box min-h-[400px]">
                          <div class="tradingview-widget-container">
                             <div class="tradingview-widget-container__widget"></div>
@@ -233,70 +258,83 @@ const marketHours = [
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-9">
                 <div class="space-y-20">
-                    {categories.map((cat) => {
+                    {categories.map((cat, index) => {
                         const posts = getCategoryPosts(cat.id);
                         const hasPosts = posts.length > 0;
                         const [firstPost, ...listPosts] = hasPosts ? posts.slice(0, 5) : [null, []];
 
                         return (
-                            <section id={cat.id} class="wsj-double-rule pt-4 scroll-mt-24">
-                                <h2 class="text-[12px] font-black uppercase tracking-[0.2em] mb-6 inline-block border-b-4 border-black text-black pb-1">
-                                    {cat.label} Intelligence
-                                </h2>
-                                
-                                {hasPosts ? (
-                                    <div class="grid grid-cols-1 md:grid-cols-9 gap-8">
-                                        <div class="md:col-span-4 column-divider md:pr-6">
-                                            <article class="group mb-8">
-                                                <div class="aspect-[4/3] overflow-hidden bg-gray-100 mb-3 border border-gray-200 rounded-lg">
-                                                    <img src={firstPost.data.image} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={firstPost.data.title}/>
-                                                </div>
-                                                <a href={getUrl(firstPost.id)}>
-                                                    <h3 class="text-[17px] font-bold text-black group-hover:text-[#990000] leading-tight font-serif">
-                                                        {firstPost.data.title}
-                                                    </h3>
-                                                    <p class="text-xs text-gray-600 mt-2 line-clamp-3 leading-relaxed">{firstPost.data.description}</p>
-                                                </a>
-                                            </article>
-                                        </div>
-                                        <div class="md:col-span-5">
-                                            {listPosts.map((post) => (
-                                                <article class="border-b border-gray-100 pb-4 last:border-0 mb-4">
-                                                    <a href={getUrl(post.id)} class="group flex gap-4 text-slate-900">
-                                                        <div class="flex-grow">
-                                                            <h4 class="text-[14px] font-bold text-black group-hover:underline leading-snug mb-1">{post.data.title}</h4>
-                                                            <p class="text-[11px] text-gray-500 line-clamp-2 leading-relaxed">{post.data.description}</p>
-                                                        </div>
-                                                        {post.data.image && (
-                                                            <div class="w-16 h-16 flex-shrink-0 bg-gray-100 border border-gray-200 rounded">
-                                                                <img src={post.data.image} class="w-full h-full object-cover" alt="" />
-                                                            </div>
-                                                        )}
+                            <>
+                                <section id={cat.id} class="wsj-double-rule pt-4 scroll-mt-24">
+                                    <h2 class="text-[11px] font-black uppercase tracking-[0.2em] mb-6 inline-block bg-[#333333] text-white px-2.5 py-1 font-mono rounded-sm">
+                                        // {cat.label} Intelligence
+                                    </h2>
+                                    
+                                    {hasPosts && firstPost ? (
+                                        <div class="grid grid-cols-1 md:grid-cols-9 gap-8">
+                                            <div class="md:col-span-4 column-divider md:pr-6">
+                                                <article class="group mb-4 bg-white border border-[#333333]/10 p-4 rounded-xl shadow-sm">
+                                                    <div class="aspect-[4/3] overflow-hidden bg-gray-100 mb-3 border border-[#333333]/5 rounded-lg">
+                                                        <img src={firstPost.data.image} class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500" alt={firstPost.data.title}/>
+                                                    </div>
+                                                    <a href={getUrl(firstPost.id)}>
+                                                        <h3 class="text-[16px] font-bold text-[#333333] group-hover:text-[#ff3333] transition-colors leading-tight font-serif">
+                                                            {firstPost.data.title}
+                                                        </h3>
+                                                        <p class="text-xs text-gray-600 mt-2 line-clamp-3 leading-relaxed font-medium">{firstPost.data.description}</p>
                                                     </a>
                                                 </article>
-                                            ))}
+                                            </div>
+                                            <div class="md:col-span-5 space-y-4">
+                                                {listPosts.map((post) => (
+                                                    <article class="bg-white border border-[#333333]/5 p-3.5 rounded-xl shadow-sm transition-all duration-300 hover:border-[#333333]/20">
+                                                        <a href={getUrl(post.id)} class="group flex gap-4 text-[#333333]">
+                                                            <div class="flex-grow">
+                                                                <h4 class="text-[13px] font-bold text-[#333333] group-hover:text-[#ff3333] transition-all leading-snug mb-1">{post.data.title}</h4>
+                                                                <p class="text-[11px] text-gray-500 line-clamp-2 leading-relaxed font-medium">{post.data.description}</p>
+                                                            </div>
+                                                            {post.data.image && (
+                                                                <div class="w-16 h-16 flex-shrink-0 bg-gray-100 border border-[#333333]/10 rounded-md overflow-hidden">
+                                                                    <img src={post.data.image} class="w-full h-full object-cover" alt="" />
+                                                                </div>
+                                                            )}
+                                                        </a>
+                                                    </article>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div class="py-8 border border-dashed border-[#333333]/10 text-center bg-white rounded-xl shadow-sm">
+                                            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 italic">Analysis for {cat.label} is currently being prepared.</p>
+                                        </div>
+                                    )}
+                                </section>
+
+                                {/* PLACEMENT IKLAN 2: INLINE AD (Sisipan Tengah Feed setelah kategori ke-2: Currencies) */}
+                                {index === 1 && (
+                                    <div class="w-full bg-white border border-[#333333]/10 py-4 text-center flex flex-col items-center justify-center rounded-xl shadow-sm my-12">
+                                        <span class="text-[8px] font-black tracking-widest text-gray-400 uppercase mb-1">Sponsored Content</span>
+                                        <div class="text-[11px] font-mono text-gray-400 bg-[#f8f9fa] border border-[#333333]/5 px-6 py-1.5 shadow-sm rounded">
+                                            In-Feed Market Banner Ad Space
                                         </div>
                                     </div>
-                                ) : (
-                                    <div class="py-8 border border-dashed border-gray-200 text-center bg-gray-50/30">
-                                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 italic">Analysis for {cat.label} is currently being prepared.</p>
-                                    </div>
                                 )}
-                            </section>
+                            </>
                         );
                     })}
                 </div>
             </div>
 
+            <!-- SIDEBAR POPULAR -->
             <aside class="lg:col-span-3">
-                <div class="sticky top-24">
-                    <h4 class="text-[10px] font-black uppercase tracking-widest mb-4 border-b-2 border-black pb-1 text-black">Most Read</h4>
-                    <div class="divide-y divide-gray-200">
+                <div class="sticky top-28 bg-white border border-[#333333]/10 p-4 rounded-xl shadow-sm">
+                    <h4 class="text-[10px] font-black uppercase tracking-widest mb-4 border-b-2 border-[#333333] pb-1 text-[#333333]">Most Read</h4>
+                    <div class="divide-y divide-gray-100">
                         {mostPopular.length > 0 ? mostPopular.map((post, index) => (
-                            <div class="flex gap-4 py-4 first:pt-0 text-black">
-                                <span class="text-3xl font-serif font-black text-gray-200 italic leading-none min-w-[30px]">{index + 1}</span>
+                            <div class="flex gap-4 py-3.5 first:pt-0 text-[#333333]">
+                                <span class="text-xl font-serif font-bold text-gray-300 leading-none min-w-[24px]">{index + 1}</span>
                                 <a href={getUrl(post.id)} class="group">
-                                    <h5 class="text-[12px] font-bold text-black leading-tight group-hover:text-[#990000]">{post.data.title}</h5>
+                                    <h5 class="text-[12px] font-bold text-[#333333] leading-tight group-hover:text-[#ff3333] transition-colors">{post.data.title}</h5>
                                 </a>
                             </div>
                         )) : <p class="text-[10px] text-gray-400 italic mt-4 uppercase">No trending data</p>}
@@ -328,11 +366,11 @@ const marketHours = [
             if (isOpen || (m.name === 'Forex' && !isWeekend)) {
               dot.style.backgroundColor = '#22c55e';
               label.innerText = 'OPEN';
-              label.className = `status-label-${safeName} text-[8px] font-black uppercase py-1 text-center bg-green-100 text-green-800`;
+              label.className = `status-label-${safeName} text-[8px] font-black uppercase py-1 text-center bg-green-50 text-green-700 border border-green-200/50 rounded-sm`;
             } else {
               dot.style.backgroundColor = '#ef4444';
               label.innerText = 'CLOSED';
-              label.className = `status-label-${safeName} text-[8px] font-black uppercase py-1 text-center bg-red-100 text-red-800`;
+              label.className = `status-label-${safeName} text-[8px] font-black uppercase py-1 text-center bg-red-50 text-red-700 border border-red-200/50 rounded-sm`;
             }
           });
         }

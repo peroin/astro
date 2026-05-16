@@ -4,30 +4,47 @@ import { getCollection } from 'astro:content';
 import SEO from '../components/SEO.astro';
 import Footer from '../components/Footer.astro';
 
-const allPosts = await getCollection('blog');
+// Mengambil koleksi 'blog' secara aman
+const allPosts = (await getCollection('blog')) || [];
 
-// Filter post khusus kategori company
+// Filter post khusus yang jalurnya diawali dengan 'company/' (Kebal Huruf Kapital)
 const companyPosts = allPosts
-  .filter(post => post.id.startsWith('company/'))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  .filter(post => post?.id?.toLowerCase().startsWith('company/'))
+  .sort((a, b) => {
+    const dateA = a.data?.pubDate ? new Date(a.data.pubDate).valueOf() : 0;
+    const dateB = b.data?.pubDate ? new Date(b.data.pubDate).valueOf() : 0;
+    return dateB - dateA;
+  });
 
-// Destructuring untuk Headline & Sidebar
+// Destructuring aman untuk Headline & Layout Modern
 const [mainHeadline, ...otherPosts] = companyPosts;
-const topStories = otherPosts.slice(0, 3);
-const analysisSide = otherPosts.slice(3, 6);
-const mostPopular = companyPosts.slice(0, 8); 
+const bentoStories = otherPosts.slice(0, 4); 
+const analysisSide = otherPosts.slice(4, 8);
+const mostPopular = companyPosts.slice(0, 5); 
 
-// Helper functions
-const getCategoryPosts = (slug: string) => companyPosts.filter(post => post.id.includes(`company/${slug}/`));
-const getUrl = (id: string) => `/company/${id.replace('company/', '')}`;
+// Helper functions disesuaikan dengan struktur: company/subkategori/judul/index
+const getCategoryPosts = (slug: string) => {
+  return companyPosts.filter(post => {
+    if (!post?.id) return false;
+    const pathParts = post.id.toLowerCase().split('/'); // Memecah 'company/fintech/judul/index'
+    return pathParts[1] === slug.toLowerCase(); // Mengambil indeks ke-1 yaitu 'fintech'
+  });
+};
 
+// Merapikan URL agar mengarah ke slug bersih tanpa kata '/index' dan bebas error replacer
+const getUrl = (id: string) => {
+  if (!id) return '#';
+  const cleanId = id.replace(/\/index$/, '');
+  return `/company/${cleanId.replace(/^company\//i, '')}`;
+};
+
+// Menyinkronkan subkategori
 const categories = [
     { id: 'banking', label: 'Banking & Finance' },
     { id: 'fintech', label: 'Fintech' },
-    { id: 'institutional', label: 'Institutional' },
-    { id: 'digital-asset', label: 'Digital Asset' },
     { id: 'technology', label: 'Technology' },
-    { id: 'energy', label: 'Energy & ESG' }
+    { id: 'energy-esg', label: 'Energy & ESG' },
+    { id: 'institutional', label: 'Institutional' }
 ];
 ---
 
@@ -36,179 +53,292 @@ const categories = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <SEO title="Corporate Strategy & Intelligence | Daily RWA" description="Analisis mendalam mengenai strategi perusahaan, manajemen aset, dan tren korporasi global." />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&family=Playfair+Display:ital,wght=0,700;0,900;1,700&display=swap" rel="stylesheet">
     
     <style is:global>
         :root {
-            --wsj-bg: #fffcf5;
-            --wsj-black: #1a1a1a;
-            --brand-red: #990000;
+            --modern-bg: #f8f9fa; 
+            --modern-black: #333333; 
+            --brand-red: #ff3333; 
         }
-        body { background-color: var(--wsj-bg); color: var(--wsj-black); font-family: 'Inter', sans-serif; }
+        body { 
+            background-color: var(--modern-bg); 
+            color: var(--modern-black); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+        }
         .font-serif { font-family: 'Playfair Display', serif; }
-        .wsj-double-rule { border-top: 3px double #000; }
-        .wsj-thin-rule { border-top: 1px solid #d2d2d2; }
-        .column-divider { border-right: 1px solid #e0e0e0; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-
-        @media (max-width: 1024px) {
-            .column-divider { border-right: none; border-bottom: 1px solid #e0e0e0; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
-        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--modern-bg); }
+        ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 0px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--modern-black); }
     </style>
 </head>
 
-<body class="antialiased">
+<body class="antialiased selection:bg-[#333333] selection:text-white">
 
-    <!-- HEADER -->
-    <header class="max-w-7xl mx-auto px-4 pt-6 pb-4 text-center">
-        <a href="/" class="inline-block">
-            <h1 class="text-5xl md:text-6xl font-serif font-black italic tracking-tighter">
-                DAILY <span class="text-[#990000]">RWA</span>
-            </h1>
-        </a>
+    <!-- TOP GLOBAL NAVBAR -->
+    <header class="fixed top-0 w-full z-[110] bg-[#0d0d0d] border-b border-white/10 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 group">
+                <span class="text-xl font-extrabold tracking-tighter text-white uppercase italic">
+                    Daily<span class="text-[#ff3333] font-sans not-italic">RWA</span>
+                </span>
+            </a>
+
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="/" class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-colors">Home</a>
+                <a href="/world" class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-colors">World</a>
+                <a href="/market" class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-colors">Market</a>
+                <a href="/company" class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-white border-b-2 border-[#ff3333] pb-1">Company</a>
+                <a href="/digital-asset" class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-colors">Digital Asset</a>
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <span class="text-[8px] font-bold text-[#ff3333] uppercase tracking-widest bg-white/10 px-2.5 py-1 font-mono">Live Node</span>
+            </div>
+        </div>
     </header>
 
-    <!-- MAIN NAV -->
-    <nav class="border-y border-black bg-[#fffcf5] z-50">
-        <div class="max-w-7xl mx-auto px-4">
-            <ul class="flex justify-center items-center gap-6 md:gap-8 py-3 text-[11px] font-black uppercase tracking-[0.2em] overflow-x-auto no-scrollbar">
-                <li><a href="/" class="hover:text-[#990000] whitespace-nowrap">Home</a></li>
-                <li><a href="/world" class="hover:text-[#990000] whitespace-nowrap">World</a></li>
-                <li><a href="/market" class="hover:text-[#990000] whitespace-nowrap">Market</a></li>
-                <li><a href="/company" class="text-[#990000] whitespace-nowrap">Company</a></li>
-                <li><a href="/digital-asset" class="hover:text-[#990000] whitespace-nowrap">Digital Asset</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto px-4 mt-8">
+    <main class="max-w-7xl mx-auto px-4 md:px-6 mt-24">
         
-        <!-- TOP SECTION (Headline) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
-            <section class="lg:col-span-8 column-divider lg:pr-8">
-                {mainHeadline && (
-                    <article>
-                        <div class="flex flex-col-reverse md:flex-row gap-6 mb-6">
-                            <div class="md:w-1/3">
-                                <a href={getUrl(mainHeadline.id)}>
-                                    <h2 class="text-2xl md:text-3xl font-serif font-bold leading-tight mb-3 hover:text-[#990000]">
-                                        {mainHeadline.data.title}
-                                    </h2>
-                                </a>
-                                <p class="text-xs text-gray-700 leading-relaxed mb-4">{mainHeadline.data.description}</p>
-                                <span class="text-[9px] font-bold text-[#990000] uppercase border-t border-[#990000] pt-1">Corporate Intelligence</span>
-                            </div>
-                            <div class="md:w-2/3">
-                                <div class="aspect-video overflow-hidden border border-gray-200">
-                                    <img src={mainHeadline.data.image} alt={mainHeadline.data.title} class="w-full h-full object-cover" />
+        <!-- SLOT IKLAN 1 -->
+        <div class="w-full flex justify-center mb-8 pt-4">
+            <div class="w-full max-w-[728px] h-[90px] bg-white border border-black/5 flex flex-col items-center justify-center relative group rounded shadow-sm">
+                <span class="absolute top-1 left-2 text-[7px] tracking-widest font-mono text-gray-400 uppercase">Sponsored Announcement</span>
+                <p class="text-[11px] font-mono text-gray-400 group-hover:text-black transition-colors">Leaderboard Ad Space [728x90]</p>
+            </div>
+        </div>
+
+        <!-- INTRO HEADER -->
+        <div class="mb-10 border-b border-black/10 pb-4">
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight uppercase font-mono">
+                // Company
+            </h1>
+        </div>
+
+        <!-- HERO BENTO GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-16">
+            <!-- Main Headline Box -->
+            <div class="lg:col-span-7 bg-white border border-black/5 p-6 flex flex-col justify-between group transition-all duration-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.04)] hover:border-black/10 relative overflow-hidden rounded-lg">
+                {mainHeadline ? (
+                    <article class="h-full flex flex-col justify-between space-y-6">
+                        <div>
+                            <div class="aspect-[16/10] overflow-hidden bg-gray-100 rounded-lg mb-6 relative border border-black/5">
+                                {mainHeadline.data.image && (
+                                    <img 
+                                        src={mainHeadline.data.image} 
+                                        alt={mainHeadline.data.title} 
+                                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" 
+                                    />
+                                )}
+                                <div class="absolute top-4 left-4 bg-[#333333] text-white text-[8px] font-bold tracking-widest uppercase px-2 py-1 font-mono rounded">
+                                    Core Intelligence
                                 </div>
                             </div>
+                            <a href={getUrl(mainHeadline.id)}>
+                                <h2 class="text-xl md:text-3xl font-serif font-bold leading-tight group-hover:text-[#ff3333] transition-colors">
+                                    {mainHeadline.data.title}
+                                </h2>
+                            </a>
+                            <p class="text-xs md:text-sm text-gray-600 mt-3 font-medium leading-relaxed line-clamp-3">
+                                {mainHeadline.data.description}
+                            </p>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 wsj-thin-rule pt-6">
-                            {topStories.map(post => (
-                                <article>
-                                    <a href={getUrl(post.id)} class="group">
-                                        <h3 class="text-sm font-bold leading-tight mb-1 group-hover:underline">{post.data.title}</h3>
-                                        <p class="text-[10px] text-gray-500 line-clamp-2">{post.data.description}</p>
-                                    </a>
-                                </article>
-                            ))}
+                        <div class="flex items-center justify-between pt-4 border-t border-black/5">
+                            <span class="text-[9px] font-extrabold uppercase tracking-wider bg-black/5 px-2 py-0.5 rounded text-gray-700">Strategy View</span>
+                            <span class="text-[10px] font-mono text-gray-400 group-hover:text-[#333333] transition-colors">Open Index &rarr;</span>
                         </div>
                     </article>
+                ) : (
+                    <div class="h-full flex items-center justify-center text-gray-400 italic font-serif">No Corporate Headlines Available.</div>
                 )}
-            </section>
+            </div>
 
-            <aside class="lg:col-span-4">
-                <h4 class="text-[10px] font-black uppercase tracking-widest mb-4 border-b-2 border-black pb-1">Strategy & Analysis</h4>
-                <div class="space-y-6">
-                    {analysisSide.map(post => (
-                        <div class="border-b border-gray-100 last:border-0 pb-4">
-                            <a href={getUrl(post.id)} class="group">
-                                <h5 class="text-md font-serif font-bold leading-snug group-hover:text-[#990000]">{post.data.title}</h5>
-                                <p class="text-[10px] text-gray-400 mt-1 italic font-medium">By Iqbal Maulana</p>
+            <!-- Bento Sub-Grid -->
+            <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {bentoStories && bentoStories.length > 0 ? bentoStories.map((post) => (
+                    <div class="bg-white border border-black/5 p-4 flex flex-col justify-between group transition-all duration-300 hover:shadow-md hover:border-black/10 rounded-lg">
+                        <div>
+                            <div class="aspect-video w-full overflow-hidden bg-gray-100 mb-3 border border-black/5 rounded-md">
+                                {post.data.image && <img src={post.data.image} alt={post.data.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />}
+                            </div>
+                            <a href={getUrl(post.id)}>
+                                <h3 class="text-xs font-bold line-clamp-2 leading-snug group-hover:text-[#ff3333] transition-colors">{post.data.title}</h3>
                             </a>
                         </div>
-                    ))}
-                </div>
-            </aside>
+                        <p class="text-[10px] font-mono text-gray-400 mt-4 uppercase tracking-wider">Filed by {post.data.author || 'Analyst'}</p>
+                    </div>
+                )) : (
+                    <div class="col-span-full h-full flex items-center justify-center text-gray-400 italic font-serif border border-dashed border-black/10 rounded-lg bg-white p-6">No Briefings Available.</div>
+                )}
+            </div>
         </div>
 
         <!-- STICKY SUB-NAV -->
-        <nav class="border-y border-black sticky top-0 bg-[#fffcf5]/95 backdrop-blur-sm z-40 mb-8 shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 text-center">
-                <ul class="flex justify-center items-center gap-6 py-2 text-[10px] font-black uppercase tracking-widest overflow-x-auto no-scrollbar">
+        <nav class="sticky top-16 bg-[#0d0d0d] z-40 mb-16 shadow-xl border-y border-white/5 rounded-lg overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4">
+                <ul class="flex justify-start md:justify-center items-center gap-3 py-3 overflow-x-auto no-scrollbar">
                     {categories.map(cat => (
-                        <li><a href={`#${cat.id}`} class="text-gray-500 hover:text-black hover:underline whitespace-nowrap">{cat.label}</a></li>
+                        <li>
+                            <a 
+                                href={`#${cat.id}`} 
+                                class="text-[10px] font-extrabold uppercase tracking-widest text-gray-300 bg-white/5 border border-white/10 hover:border-white hover:text-[#0d0d0d] hover:bg-white px-5 py-2.5 transition-all block whitespace-nowrap rounded"
+                            >
+                                {cat.label}
+                            </a>
+                        </li>
                     ))}
                 </ul>
             </div>
         </nav>
 
-        <!-- CATEGORY FEED -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-9">
-                <div class="space-y-20">
-                    {categories.map((cat) => {
-                        const posts = getCategoryPosts(cat.id);
-                        if (posts.length === 0) return null;
-                        const [firstPost, ...listPosts] = posts.slice(0, 5);
+        <!-- MAIN LAYOUT -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-24">
+            
+            <!-- LEFT CONTENT -->
+            <div class="lg:col-span-8 space-y-20">
+                {categories.map((cat, index) => {
+                    const posts = getCategoryPosts(cat.id);
+                    const hasPosts = posts.length > 0;
+                    const [firstPost, ...listPosts] = hasPosts ? posts.slice(0, 4) : [null, []];
 
-                        return (
-                            <section id={cat.id} class="wsj-double-rule pt-4 scroll-mt-24">
-                                <h2 class="text-[12px] font-black uppercase tracking-[0.2em] mb-6 inline-block border-b-4 border-black text-black pb-1">
-                                    {cat.label}
-                                </h2>
-                                <div class="grid grid-cols-1 md:grid-cols-9 gap-6">
-                                    <div class="md:col-span-3 column-divider md:pr-6">
-                                        <article class="group">
-                                            <div class="aspect-[4/3] overflow-hidden bg-gray-100 mb-3 border border-gray-200">
-                                                <img src={firstPost.data.image} class="w-full h-full object-cover" alt={firstPost.data.title}/>
+                    return (
+                        <>
+                            <section id={cat.id} class="scroll-mt-32 group/section">
+                                <div class="flex items-center justify-between mb-6 border-b-2 border-[#333333] pb-2">
+                                    <h2 class="text-[10px] font-extrabold uppercase tracking-[0.25em] text-white bg-[#333333] px-3 py-1 font-mono rounded-sm">
+                                        // {cat.label}
+                                    </h2>
+                                    <span class="text-[10px] font-mono text-gray-400 group-hover/section:text-[#ff3333] transition-colors">
+                                        [{posts.length} Blocks]
+                                    </span>
+                                </div>
+                                
+                                {hasPosts && firstPost ? (
+                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                                        <div class="md:col-span-5 bg-white border border-black/5 p-4 flex flex-col justify-between group transition-all duration-300 hover:shadow-xl hover:border-black/20 rounded-lg">
+                                            <div>
+                                                <div class="aspect-[4/3] overflow-hidden bg-gray-100 mb-4 border border-black/5 rounded-md">
+                                                    {firstPost.data.image && <img src={firstPost.data.image} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" alt={firstPost.data.title}/>}
+                                                </div>
+                                                <a href={getUrl(firstPost.id)}>
+                                                    <h3 class="text-base font-serif font-bold leading-tight group-hover:text-[#ff3333] transition-colors">
+                                                        {firstPost.data.title}
+                                                    </h3>
+                                                </a>
+                                                <p class="text-xs text-gray-500 mt-2 line-clamp-3 leading-relaxed font-medium">{firstPost.data.description}</p>
                                             </div>
-                                            <a href={getUrl(firstPost.id)}>
-                                                <h3 class="text-[15px] font-bold text-black group-hover:text-[#990000] leading-tight font-serif">
-                                                    {firstPost.data.title}
-                                                </h3>
-                                            </a>
-                                        </article>
-                                    </div>
-                                    <div class="md:col-span-6">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                                            {listPosts.map((post) => (
-                                                <article class="border-b border-gray-100 pb-2 last:border-0">
-                                                    <a href={getUrl(post.id)} class="group">
-                                                        <h4 class="text-[13px] font-bold text-black group-hover:underline leading-snug mb-1">{post.data.title}</h4>
-                                                        <p class="text-[11px] text-gray-600 line-clamp-2 leading-relaxed">{post.data.description}</p>
-                                                    </a>
+                                            <div class="mt-4 pt-3 border-t border-gray-100 text-[9px] text-gray-400 font-mono uppercase tracking-wider">
+                                                Verified Matrix Ledger
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="md:col-span-7 space-y-3">
+                                            {listPosts.length > 0 ? listPosts.map((post) => (
+                                                <article class="bg-white border border-black/5 p-3.5 transition-all duration-300 hover:border-black/20 group flex gap-4 items-center rounded-lg">
+                                                    {post.data.image && (
+                                                        <div class="w-16 h-16 shrink-0 overflow-hidden bg-gray-100 border border-black/5 rounded hidden sm:block">
+                                                            <img src={post.data.image} class="w-full h-full object-cover" alt="" />
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <a href={getUrl(post.id)}>
+                                                            <h4 class="text-xs font-bold group-hover:text-[#ff3333] transition-colors leading-snug mb-1">
+                                                                {post.data.title}
+                                                            </h4>
+                                                        </a>
+                                                        <p class="text-[11px] text-gray-500 line-clamp-2 leading-relaxed font-medium">{post.data.description}</p>
+                                                    </div>
                                                 </article>
-                                            ))}
+                                            )) : (
+                                                <div class="h-full flex items-center justify-center border border-dashed border-gray-200 p-8 text-xs text-gray-400 italic rounded-lg bg-white">
+                                                    More intel briefings are being compiled.
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div class="py-12 border border-dashed border-black/10 text-center bg-white rounded-lg">
+                                        <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold font-mono">Syncing {cat.label} Intel...</p>
+                                    </div>
+                                )}
+                            </section>
+
+                            <!-- SLOT IKLAN 2 -->
+                            {index === 1 && (
+                                <div class="w-full py-4 border-y border-black/5 my-8 flex justify-center bg-white/50 rounded-lg">
+                                    <div class="w-full max-w-[468px] sm:max-w-[728px] h-[90px] flex flex-col items-center justify-center relative group">
+                                        <span class="text-[7px] tracking-widest font-mono text-gray-400 uppercase mb-1">Advertisement Feed</span>
+                                        <div class="text-[11px] font-mono text-gray-400 group-hover:text-[#333333] transition-colors border border-dashed border-black/10 bg-white px-6 py-2 rounded">
+                                            Inline Content Banner [728x90]
                                         </div>
                                     </div>
                                 </div>
-                            </section>
-                        );
-                    })}
-                </div>
+                            )}
+                        </>
+                    );
+                })}
             </div>
 
-            <!-- SIDEBAR POPULAR -->
-            <aside class="lg:col-span-3">
-                <div class="sticky top-24">
-                    <h4 class="text-[10px] font-black uppercase tracking-widest mb-4 border-b-2 border-black pb-1 text-black">Most Read in Company</h4>
-                    <div class="divide-y divide-gray-200">
-                        {mostPopular.map((post, index) => (
-                            <div class="flex gap-4 py-4 first:pt-0">
-                                <span class="text-2xl font-serif font-bold text-gray-300 italic leading-none">{index + 1}</span>
+            <!-- RIGHT CONTENT: SIDEBAR -->
+            <aside class="lg:col-span-4 space-y-8">
+                <!-- Live Intelligence -->
+                <div class="bg-[#333333] text-white p-5 shadow-xl border border-white/5 rounded-lg">
+                    <h4 class="text-[10px] font-mono uppercase tracking-[0.3em] text-[#ff3333] mb-4 font-bold">&bull; Live Intelligence</h4>
+                    <div class="space-y-4 divide-y divide-white/10">
+                        {analysisSide && analysisSide.length > 0 ? analysisSide.map(post => (
+                            <div class="pt-4 first:pt-0">
                                 <a href={getUrl(post.id)} class="group">
-                                    <h5 class="text-[12px] font-bold text-black leading-tight group-hover:text-[#990000]">{post.data.title}</h5>
+                                    <h5 class="text-xs font-bold leading-snug text-white group-hover:text-gray-300 transition-colors">{post.data.title}</h5>
+                                    <p class="text-[9px] text-gray-400 mt-2 uppercase tracking-widest font-mono">Index // {post.data.author || 'SYSTEM'}</p>
                                 </a>
                             </div>
-                        ))}
+                        )) : (
+                            <p class="text-xs text-zinc-400 italic">No alternative briefs recorded.</p>
+                        )}
+                    </div>
+                </div>
+
+                <!-- Trending Core Reports -->
+                <div class="bg-white border border-black/5 p-5 rounded-lg">
+                    <h4 class="text-[10px] font-extrabold uppercase tracking-widest mb-4 border-b-2 border-[#333333] pb-2">
+                        Trending Core Reports
+                    </h4>
+                    <div class="space-y-4">
+                        {mostPopular && mostPopular.length > 0 ? mostPopular.map((post, index) => (
+                            <div class="flex gap-4 items-start group">
+                                <span class="text-xl font-mono font-bold text-gray-200 group-hover:text-[#333333] transition-colors leading-none">
+                                    0{index + 1}
+                                </span>
+                                <div class="space-y-1">
+                                    <a href={getUrl(post.id)}>
+                                        <h5 class="text-xs font-bold leading-snug group-hover:underline decoration-[#ff3333] decoration-2">
+                                            {post.data.title}
+                                        </h5>
+                                    </a>
+                                </div>
+                            </div>
+                        )) : (
+                            <p class="text-xs text-gray-400 italic pt-2">No trending data feeds available.</p>
+                        )}
+                    </div>
+                </div>
+
+                <!-- SLOT IKLAN 3 -->
+                <div class="sticky top-32 bg-white border border-black/5 p-4 flex flex-col items-center justify-center min-h-[250px] relative group rounded-lg shadow-sm">
+                    <span class="absolute top-2 left-3 text-[7px] tracking-widest font-mono text-gray-400 uppercase">Sponsored Sidebar</span>
+                    <div class="w-[300px] h-[250px] border border-dashed border-black/10 bg-[#f8f9fa] flex items-center justify-center text-[11px] font-mono text-gray-400 group-hover:text-[#333333] transition-colors rounded">
+                        Medium Rectangle [300x250]
                     </div>
                 </div>
             </aside>
+
         </div>
     </main>
 
+    <!-- FOOTER -->
     <Footer />
 
 </body>

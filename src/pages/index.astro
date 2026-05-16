@@ -1,4 +1,5 @@
 ---
+// src/pages/index.astro
 import { getCollection } from 'astro:content';
 import SEO from '../components/SEO.astro';
 import Footer from '../components/Footer.astro';
@@ -39,50 +40,70 @@ const getSectionPosts = (sectionId: string) =>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <SEO title="Daily RWA | Global Intelligence & Research" description="Platform riset dan intelijen global mengenai tokenisasi Real World Assets (RWA)." />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght=0,700;0,900;1,700&family=Inter:wght=400;500;700;900&display=swap" rel="stylesheet">
     
     <style is:global>
         :root {
-            --wsj-bg: #fffcf5;
-            --wsj-black: #1a1a1a;
-            --brand-red: #990000;
+            --modern-bg: #f8f9fa; /* Latar belakang Off-White yang teduh di mata */
+            --modern-black: #333333; /* Dark Charcoal sebagai pengganti hitam pekat */
+            --brand-red: #ff3333; /* Merah Aksentuasi */
         }
-        body { background-color: var(--wsj-bg); color: var(--wsj-black); font-family: 'Inter', sans-serif; }
+        body { 
+            background-color: var(--modern-bg) !important; 
+            color: var(--modern-black); 
+            font-family: 'Inter', sans-serif; 
+        }
         .font-serif { font-family: 'Playfair Display', serif; }
-        .wsj-double-rule { border-top: 3px double #000; }
-        .wsj-thin-rule { border-top: 1px solid #d2d2d2; }
-        .column-divider { border-right: 1px solid #e0e0e0; }
+        .wsj-double-rule { border-top: 3px double var(--modern-black); }
+        .wsj-thin-rule { border-top: 1px solid rgba(51, 51, 51, 0.15); }
+        .column-divider { border-right: 1px solid rgba(51, 51, 51, 0.15); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
         @media (max-width: 1024px) {
-            .column-divider { border-right: none; border-bottom: 1px solid #e0e0e0; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+            .column-divider { border-right: none; border-bottom: 1px solid rgba(51, 51, 51, 0.15); padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
         }
+
+        /* Custom Scrollbar subtle senada dengan warna arang */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--modern-bg); }
+        ::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--modern-black); }
     </style>
 </head>
 
-<body class="antialiased">
+<body class="antialiased selection:bg-[#333333] selection:text-white">
 
-    <!-- HEADER (Identik dengan World.astro) -->
+    <!-- HEADER -->
     <header class="max-w-7xl mx-auto px-4 pt-6 pb-4 text-center">
-        <a href="/" class="inline-block">
-            <h1 class="text-5xl md:text-6xl font-serif font-black italic tracking-tighter">
-                DAILY <span class="text-[#990000]">RWA</span>
+        <a href="/" class="inline-block group">
+            <h1 class="text-5xl md:text-6xl font-serif font-black italic tracking-tighter text-[#333333] transition-colors group-hover:text-black">
+                DAILY <span class="text-[#ff3333] not-italic">RWA</span>
             </h1>
         </a>
     </header>
 
-    <!-- MAIN NAV -->
-    <nav class="border-y border-black bg-[#fffcf5] z-50 sticky top-0">
+    <!-- MAIN NAV (Menggunakan Charcoal Gelap Pekat #1a1a1a untuk kedalaman kontras struktural) -->
+    <nav class="bg-[#1a1a1a] z-50 sticky top-0 shadow-md">
         <div class="max-w-7xl mx-auto px-4">
-            <ul class="flex justify-center items-center gap-6 md:gap-8 py-3 text-[11px] font-black uppercase tracking-[0.2em] overflow-x-auto no-scrollbar">
-                <li><a href="/" class="text-[#990000] whitespace-nowrap">Home</a></li>
-                <li><a href="/world" class="hover:text-[#990000] whitespace-nowrap">World</a></li>
-                <li><a href="/market" class="hover:text-[#990000] whitespace-nowrap">Market</a></li>
-                <li><a href="/company" class="hover:text-[#990000] whitespace-nowrap">Company</a></li>
-                <li><a href="/digital-asset" class="hover:text-[#990000] whitespace-nowrap">Digital Asset</a></li>
+            <ul class="flex justify-center items-center gap-6 md:gap-8 py-3.5 text-[11px] font-black uppercase tracking-[0.2em] overflow-x-auto no-scrollbar">
+                <li><a href="/" class="text-white border-b-2 border-[#ff3333] pb-1 whitespace-nowrap">Home</a></li>
+                <li><a href="/world" class="text-gray-400 hover:text-white transition-colors whitespace-nowrap">World</a></li>
+                <li><a href="/market" class="text-gray-400 hover:text-white transition-colors whitespace-nowrap">Market</a></li>
+                <li><a href="/company" class="text-gray-400 hover:text-white transition-colors whitespace-nowrap">Company</a></li>
+                <li><a href="/digital-asset" class="text-gray-400 hover:text-white transition-colors whitespace-nowrap">Digital Asset</a></li>
             </ul>
         </div>
     </nav>
+
+    <!-- PLACEMENT IKLAN 1: BILLBOARD AD (Top Page Banner) -->
+    <div class="max-w-7xl mx-auto px-4 mt-6">
+        <div class="w-full bg-white border border-[#333333]/10 py-6 text-center flex flex-col items-center justify-center rounded-lg shadow-sm group">
+            <span class="text-[8px] font-black tracking-widest text-gray-400 uppercase mb-1">Sponsored Advertisement</span>
+            <div class="text-xs font-mono font-medium text-gray-400 border border-dashed border-[#333333]/20 group-hover:text-[#333333] group-hover:border-[#333333]/40 transition-colors px-8 py-2 rounded">
+                Leaderboard Ad Space (e.g., 728x90 or Flexible Responsive)
+            </div>
+        </div>
+    </div>
 
     <main class="max-w-7xl mx-auto px-4 mt-8">
         
@@ -90,20 +111,22 @@ const getSectionPosts = (sectionId: string) =>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
             <section class="lg:col-span-8 column-divider lg:pr-8">
                 {mainHeadline && (
-                    <article>
+                    <article class="bg-white border border-[#333333]/10 p-5 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.01)]">
                         <div class="flex flex-col-reverse md:flex-row gap-6 mb-6">
-                            <div class="md:w-1/3">
-                                <a href={getUrl(mainHeadline.id)}>
-                                    <h2 class="text-2xl md:text-4xl font-serif font-bold leading-tight mb-3 hover:text-[#990000]">
-                                        {mainHeadline.data.title}
-                                    </h2>
-                                </a>
-                                <p class="text-xs text-gray-700 leading-relaxed mb-4">{mainHeadline.data.description}</p>
-                                <span class="text-[9px] font-bold text-[#990000] uppercase border-t border-[#990000] pt-1">The Headline</span>
+                            <div class="md:w-1/3 flex flex-col justify-between">
+                                <div>
+                                    <a href={getUrl(mainHeadline.id)}>
+                                        <h2 class="text-2xl md:text-4xl font-serif font-bold leading-tight mb-3 hover:text-[#ff3333] text-[#333333] transition-colors">
+                                            {mainHeadline.data.title}
+                                        </h2>
+                                    </a>
+                                    <p class="text-xs text-gray-600 leading-relaxed mb-4 font-medium">{mainHeadline.data.description}</p>
+                                </div>
+                                <span class="text-[9px] font-bold text-[#ff3333] uppercase border-t border-[#ff3333] pt-1.5 self-start">The Headline</span>
                             </div>
                             <div class="md:w-2/3">
-                                <div class="aspect-video overflow-hidden border border-gray-200">
-                                    <img src={mainHeadline.data.image} alt={mainHeadline.data.title} class="w-full h-full object-cover" />
+                                <div class="aspect-video overflow-hidden border border-[#333333]/5 shadow-sm rounded-lg">
+                                    <img src={mainHeadline.data.image} alt={mainHeadline.data.title} class="w-full h-full object-cover transition-transform duration-700 hover:scale-102" />
                                 </div>
                             </div>
                         </div>
@@ -113,8 +136,8 @@ const getSectionPosts = (sectionId: string) =>
                             {topStories.map(post => (
                                 <article>
                                     <a href={getUrl(post.id)} class="group">
-                                        <h3 class="text-sm font-bold leading-tight mb-1 group-hover:underline">{post.data.title}</h3>
-                                        <p class="text-[10px] text-gray-500 line-clamp-2">{post.data.description}</p>
+                                        <h3 class="text-sm font-bold leading-tight mb-1 group-hover:text-[#ff3333] text-[#333333] transition-all">{post.data.title}</h3>
+                                        <p class="text-[10px] text-gray-500 line-clamp-2 font-medium">{post.data.description}</p>
                                     </a>
                                 </article>
                             ))}
@@ -125,16 +148,18 @@ const getSectionPosts = (sectionId: string) =>
 
             <!-- SIDEBAR: Opinion & Analysis -->
             <aside class="lg:col-span-4">
-                <h4 class="text-[10px] font-black uppercase tracking-widest mb-4 border-b-2 border-black pb-1">Opinion & Analysis</h4>
-                <div class="space-y-6">
-                    {opinionSide.map(post => (
-                        <div class="border-b border-gray-100 last:border-0 pb-4">
-                            <a href={getUrl(post.id)} class="group">
-                                <h5 class="text-md font-serif font-bold leading-snug group-hover:text-[#990000]">{post.data.title}</h5>
-                                <p class="text-[10px] text-gray-400 mt-1 italic font-medium">By Iqbal Maulana</p>
-                            </a>
-                        </div>
-                    ))}
+                <div class="bg-white border border-[#333333]/10 p-5 rounded-xl shadow-sm">
+                    <h4 class="text-[10px] font-black uppercase tracking-widest mb-4 border-b-2 border-[#333333] pb-1 text-[#333333]">Opinion & Analysis</h4>
+                    <div class="space-y-6">
+                        {opinionSide.map(post => (
+                            <div class="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
+                                <a href={getUrl(post.id)} class="group">
+                                    <h5 class="text-md font-serif font-bold leading-snug text-[#333333] group-hover:text-[#ff3333] transition-colors">{post.data.title}</h5>
+                                    <p class="text-[10px] text-gray-400 mt-1 italic font-medium">By Iqbal Maulana</p>
+                                </a>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </aside>
         </div>
@@ -143,54 +168,68 @@ const getSectionPosts = (sectionId: string) =>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-9">
                 <div class="space-y-16">
-                    {sections.map((sec) => {
+                    {sections.map((sec, index) => {
                         const posts = getSectionPosts(sec.id);
                         if (posts.length === 0) return null;
                         const [first, ...rest] = posts;
 
                         return (
-                            <section class="wsj-double-rule pt-4">
-                                <div class="flex justify-between items-end mb-6">
-                                    <h2 class="text-[12px] font-black uppercase tracking-[0.2em] border-b-4 border-black pb-1">
-                                        {sec.label}
-                                    </h2>
-                                    <a href={`/${sec.id}`} class="text-[9px] font-bold uppercase hover:text-[#990000]">See All →</a>
-                                </div>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-9 gap-6">
-                                    <!-- Lead for this section -->
-                                    <div class="md:col-span-4 column-divider md:pr-6">
-                                        <article class="group">
-                                            <div class="aspect-[16/9] overflow-hidden bg-gray-100 mb-3 border border-gray-200">
-                                                <img src={first.data.image} class="w-full h-full object-cover" alt={first.data.title}/>
-                                            </div>
-                                            <a href={getUrl(first.id)}>
-                                                <h3 class="text-lg font-bold text-black group-hover:text-[#990000] leading-tight font-serif">
-                                                    {first.data.title}
-                                                </h3>
-                                                <p class="text-xs text-gray-600 mt-2 line-clamp-2">{first.data.description}</p>
-                                            </a>
-                                        </article>
+                            <>
+                                <section class="wsj-double-rule pt-4">
+                                    <div class="flex justify-between items-end mb-6">
+                                        <h2 class="text-[12px] font-black uppercase tracking-[0.2em] bg-[#333333] text-white px-2.5 py-1 font-mono rounded-sm">
+                                            // {sec.label}
+                                        </h2>
+                                        <a href={`/${sec.id}`} class="text-[9px] font-bold uppercase text-gray-400 hover:text-[#ff3333] transition-colors">See All →</a>
                                     </div>
-                                    <!-- List for this section -->
-                                    <div class="md:col-span-5">
-                                        <div class="grid grid-cols-1 gap-4">
-                                            {rest.map((post) => (
-                                                <article class="wsj-thin-rule pt-3 first:border-t-0 first:pt-0">
-                                                    <a href={getUrl(post.id)} class="group flex gap-4">
-                                                        <div class="flex-1">
-                                                            <h4 class="text-[13px] font-bold text-black group-hover:underline leading-snug">{post.data.title}</h4>
-                                                        </div>
-                                                        <div class="w-16 h-16 flex-shrink-0">
-                                                            <img src={post.data.image} class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
-                                                        </div>
-                                                    </a>
-                                                </article>
-                                            ))}
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-9 gap-6">
+                                        <!-- Lead for this section -->
+                                        <div class="md:col-span-4 column-divider md:pr-6">
+                                            <article class="group bg-white border border-[#333333]/10 p-4 rounded-xl shadow-sm">
+                                                <div class="aspect-[16/9] overflow-hidden bg-gray-100 mb-3 border border-[#333333]/5 rounded-lg">
+                                                    <img src={first.data.image} class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500" alt={first.data.title}/>
+                                                </div>
+                                                <a href={getUrl(first.id)}>
+                                                    <h3 class="text-lg font-bold text-[#333333] group-hover:text-[#ff3333] transition-colors leading-tight font-serif">
+                                                        {first.data.title}
+                                                    </h3>
+                                                    <p class="text-xs text-gray-600 mt-2 line-clamp-2 leading-relaxed font-medium">{first.data.description}</p>
+                                                </a>
+                                            </article>
+                                        </div>
+                                        <!-- List for this section -->
+                                        <div class="md:col-span-5">
+                                            <div class="grid grid-cols-1 gap-4">
+                                                {rest.map((post) => (
+                                                    <article class="bg-white border border-[#333333]/5 p-3.5 rounded-xl shadow-sm transition-all duration-300 hover:border-[#333333]/20">
+                                                        <a href={getUrl(post.id)} class="group flex gap-4 items-center">
+                                                            <div class="flex-1">
+                                                                <h4 class="text-[13px] font-bold text-[#333333] group-hover:text-[#ff3333] transition-all leading-snug">{post.data.title}</h4>
+                                                            </div>
+                                                            {post.data.image && (
+                                                                <div class="w-16 h-16 flex-shrink-0 border border-[#333333]/10 rounded-md overflow-hidden">
+                                                                    <img src={post.data.image} class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300" alt="" />
+                                                                </div>
+                                                            )}
+                                                        </a>
+                                                    </article>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </section>
+                                </section>
+
+                                {/* PLACEMENT IKLAN 2: INLINE AD (Sisipan Tengah Feed setelah kategori ke-2) */}
+                                {index === 1 && (
+                                    <div class="w-full bg-white border border-[#333333]/10 py-4 text-center flex flex-col items-center justify-center rounded-xl shadow-sm my-12 group">
+                                        <span class="text-[8px] font-black tracking-widest text-gray-400 uppercase mb-1">Sponsored Content</span>
+                                        <div class="text-[11px] font-mono text-gray-400 border border-dashed border-[#333333]/20 group-hover:text-[#333333] transition-colors px-6 py-1.5 rounded">
+                                            In-Feed Banner Ad Space
+                                        </div>
+                                    </div>
+                                )}
+                            </>
                         );
                     })}
                 </div>
@@ -198,24 +237,26 @@ const getSectionPosts = (sectionId: string) =>
 
             <!-- SIDEBAR POPULAR -->
             <aside class="lg:col-span-3">
-                <div class="sticky top-24">
-                    <h4 class="text-[10px] font-black uppercase tracking-widest mb-4 border-b-2 border-black pb-1 text-black">Most Popular</h4>
-                    <div class="divide-y divide-gray-200">
-                        {mostPopular.map((post, index) => (
-                            <div class="flex gap-4 py-4 first:pt-0">
-                                <span class="text-2xl font-serif font-bold text-gray-300 italic leading-none">{index + 1}</span>
-                                <a href={getUrl(post.id)} class="group">
-                                    <h5 class="text-[12px] font-bold text-black leading-tight group-hover:text-[#990000]">{post.data.title}</h5>
-                                </a>
-                            </div>
-                        ))}
+                <div class="sticky top-24 space-y-8">
+                    <div class="bg-white border border-[#333333]/10 p-4 rounded-xl shadow-sm">
+                        <h4 class="text-[10px] font-black uppercase tracking-widest mb-4 border-b-2 border-[#333333] pb-1 text-[#333333]">Most Popular</h4>
+                        <div class="divide-y divide-gray-100">
+                            {mostPopular.map((post, index) => (
+                                <div class="flex gap-4 py-4 first:pt-0 text-[#333333]">
+                                    <span class="text-2xl font-serif font-bold text-gray-200 leading-none min-w-[24px]">{index + 1}</span>
+                                    <a href={getUrl(post.id)} class="group">
+                                        <h5 class="text-[12px] font-bold text-[#333333] leading-tight group-hover:text-[#ff3333] transition-colors">{post.data.title}</h5>
+                                    </a>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                     
                     <!-- Newsletter / Branding Box -->
-                    <div class="mt-12 p-6 border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                        <h5 class="font-serif font-black italic text-xl mb-2">Daily RWA</h5>
-                        <p class="text-[10px] leading-relaxed text-gray-600 uppercase tracking-wider font-bold mb-4">Intelijen Aset Masa Depan Langsung ke Desktop Anda.</p>
-                        <div class="text-[9px] font-black uppercase bg-[#990000] text-white py-2 text-center cursor-pointer">Subscribe Now</div>
+                    <div class="p-6 border border-[#333333]/20 bg-white rounded-xl shadow-sm hover:border-[#333333]/40 transition-all">
+                        <h5 class="font-serif font-black italic text-xl mb-2 text-[#333333]">Daily RWA</h5>
+                        <p class="text-[10px] leading-relaxed text-gray-500 uppercase tracking-wider font-bold mb-4">Intelijen Aset Masa Depan Langsung ke Desktop Anda.</p>
+                        <div class="text-[9px] font-black uppercase bg-[#ff3333] text-white py-2.5 text-center cursor-pointer hover:bg-[#333333] transition-colors rounded">Subscribe Now</div>
                     </div>
                 </div>
             </aside>

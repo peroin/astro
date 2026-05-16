@@ -1,5 +1,6 @@
 ---
-import { getCollection, render } from 'astro:content';
+// src/pages/company/[...slug].astro
+import { getCollection } from 'astro:content'; 
 import SEO from '../../components/SEO.astro';
 import Footer from '../../components/Footer.astro';
 
@@ -8,16 +9,24 @@ export async function getStaticPaths() {
     return id.startsWith('company/');
   });
 
-  return companyPosts.map(post => ({
-    params: { 
-      slug: post.id.replace('company/', '') 
-    },
-    props: { post },
-  }));
+  return companyPosts.map(post => {
+    // Perbaikan v4: Menggunakan regex /^company\// untuk menghapus folder paling depan
+    // serta menghapus ekstensi file .md atau .mdx secara akurat untuk folder bertingkat
+    const cleanSlug = post.id
+      .replace(/^company\//, '')
+      .replace(/\.mdx?$/, ''); 
+
+    return {
+      params: { slug: cleanSlug },
+      props: { post },
+    };
+  });
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+
+// PERBAIKAN ASTRO v4: Cara render konten markdown langsung dari properti objek
+const { Content } = await post.render(); 
 
 // Mengambil berita terbaru khusus kategori Company
 const latestCompanyNews = (await getCollection('blog', ({ id }) => id.startsWith('company/')))
@@ -31,7 +40,7 @@ const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
   day: 'numeric',
 });
 
-// JSON-LD untuk Skema Berita Bisnis/Perusahaan
+// JSON-LD untuk Skema Berita Bisnis/Perusahaan (Target SEO E-E-A-T)
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "NewsArticle",
@@ -42,7 +51,8 @@ const jsonLd = {
   "author": {
     "@type": "Person",
     "name": "Iqbal Maulana",
-    "jobTitle": "Head of Research"
+    "jobTitle": "Head of Research",
+    "url": "https://chainpulse.io/author/iqbal-maulana"
   },
   "publisher": {
     "@type": "Organization",
@@ -61,7 +71,7 @@ const jsonLd = {
         image={post.data.image}
     />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     
     <style is:global>
         :root {
@@ -73,9 +83,11 @@ const jsonLd = {
         
         /* Typography Bisnis Kontemporer */
         .prose-company { font-size: 1.125rem; line-height: 1.75; color: #374151; }
-        .prose-company h2 { font-weight: 800; font-size: 1.75rem; color: var(--comp-black); margin-top: 2.5rem; margin-bottom: 1rem; letter-spacing: -0.025em; }
+        .prose-company h2 { font-weight: 800; font-size: 1.75rem; color: var(--comp-black); margin-top: 2.5rem; margin-bottom: 1rem; letter-spacing: -0.025em; border-b: 1px solid #e5e7eb; padding-bottom: 0.375rem; }
         .prose-company p { margin-bottom: 1.5rem; }
-        .prose-company strong { color: var(--comp-black); }
+        .prose-company strong { color: var(--comp-black); font-weight: 700; }
+        .prose-company ul { list-style-type: disc; margin-left: 1.25rem; margin-bottom: 1.5rem; }
+        .prose-company li { margin-bottom: 0.375rem; }
         
         .ad-container { background: #ffffff; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; position: relative; }
         .ad-tag { position: absolute; top: 0; left: 50%; transform: translate(-50%, -100%); font-size: 9px; font-weight: 700; color: #9ca3af; text-transform: uppercase; }
@@ -91,7 +103,7 @@ const jsonLd = {
                 <a href="/company" class="text-[10px] font-bold uppercase tracking-[0.3em] opacity-60 hover:opacity-100 transition-opacity">
                     &larr; Corporate Intelligence
                 </a>
-                <h2 class="text-xs font-black uppercase mt-2 tracking-widest">Company Analysis</h2>
+                <h2 class="text-xs font-black uppercase mt-2 tracking-widest text-slate-400">Company Analysis</h2>
             </div>
             <div class="font-black italic text-2xl tracking-tighter">
                 DAILY <span class="text-slate-400 font-normal">RWA</span>
@@ -111,7 +123,7 @@ const jsonLd = {
                 <div class="flex items-center gap-4 mb-10 text-[11px] font-bold uppercase text-slate-500 border-b pb-6">
                     <span class="text-black">Iqbal Maulana</span>
                     <span>•</span>
-                    <time>{formattedDate}</time>
+                    <time datetime={post.data.pubDate.toISOString()}>{formattedDate}</time>
                 </div>
 
                 <!-- AD 1: Top Hero Ad -->
@@ -121,8 +133,8 @@ const jsonLd = {
                 </div>
 
                 {post.data.image && (
-                    <div class="mb-12">
-                        <img src={post.data.image} alt={post.data.title} class="w-full grayscale hover:grayscale-0 transition-all duration-700" />
+                    <div class="mb-12 border border-slate-200 p-1 bg-white">
+                        <img src={post.data.image} alt={post.data.title} class="w-full grayscale hover:grayscale-0 transition-all duration-700 object-cover h-auto" />
                     </div>
                 )}
 
@@ -155,17 +167,24 @@ const jsonLd = {
                             Latest Updates
                         </h3>
                         <div class="space-y-8">
-                            {latestCompanyNews.map(item => (
-                                <a href={`/company/${item.id.replace('company/', '')}`} class="group block">
-                                    <h4 class="font-bold text-sm leading-tight group-hover:text-blue-600 mb-2">
-                                        {item.data.title}
-                                    </h4>
-                                    <div class="flex justify-between items-center text-[9px] font-black opacity-40 uppercase">
-                                        <span>Company Report</span>
-                                        <span>{item.data.pubDate.toLocaleDateString()}</span>
-                                    </div>
-                                </a>
-                            ))}
+                            {latestCompanyNews.map(item => {
+                                // PERBAIKAN: Menggunakan regex agar subfolder bertingkat di dalam company/ ikut bersih total
+                                const itemCleanSlug = item.id
+                                  .replace(/^company\//, '')
+                                  .replace(/\.mdx?$/, '');
+                                  
+                                return (
+                                    <a href={`/company/${itemCleanSlug}`} class="group block border-b border-slate-100 pb-4 last:border-none">
+                                        <h4 class="font-bold text-sm leading-tight group-hover:text-blue-600 mb-2 transition-colors">
+                                            {item.data.title}
+                                        </h4>
+                                        <div class="flex justify-between items-center text-[9px] font-black opacity-40 uppercase">
+                                            <span>Company Report</span>
+                                            <span>{item.data.pubDate.toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'})}</span>
+                                        </div>
+                                    </a>
+                                )
+                            })}
                         </div>
                     </div>
 
@@ -173,8 +192,10 @@ const jsonLd = {
                     <div class="bg-black p-6 text-white">
                         <h4 class="text-sm font-black uppercase mb-2">Executive Summary</h4>
                         <p class="text-[11px] opacity-70 mb-4 leading-relaxed">Dapatkan ringkasan laporan perusahaan mingguan langsung ke email Anda.</p>
-                        <input type="email" placeholder="Work Email" class="w-full bg-zinc-800 border-none p-2 text-xs mb-2 focus:ring-1 ring-white outline-none" />
-                        <button class="w-full bg-white text-black font-black text-[10px] py-2 uppercase tracking-tighter hover:bg-zinc-200 transition-colors">Join List</button>
+                        <form onsubmit="return false;">
+                            <input type="email" placeholder="Work Email" class="w-full bg-zinc-800 border-none p-2 text-xs mb-2 focus:ring-1 ring-white outline-none text-white" required />
+                            <button type="submit" class="w-full bg-white text-black font-black text-[10px] py-2 uppercase tracking-tighter hover:bg-zinc-200 transition-colors">Join List</button>
+                        </form>
                     </div>
 
                 </div>
